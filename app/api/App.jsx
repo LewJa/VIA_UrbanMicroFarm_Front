@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { getLatestSensorReading } from "./api/sensorApi";
-import { getLatestSensorReading } from "./api/sensorApi";
+import { getLatestSensorReading } from "../features/sensors/service/sensorsService";
 
 function App() {
   const [data, setData] = useState(null);

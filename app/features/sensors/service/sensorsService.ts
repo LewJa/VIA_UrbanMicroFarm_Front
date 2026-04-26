@@ -1,12 +1,5 @@
-import api from "./client.js";
-
-
-export interface SensorReading {
-  sensorId: string;
-  value: number;
-  timestamp: string;
-}
-
+import api from "../../../api/client.js";
+import type { SensorReading } from "../types.js";
 
 export const getLatestSensorReading = async (
   sensorId: string
