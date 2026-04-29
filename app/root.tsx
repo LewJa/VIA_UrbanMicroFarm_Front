@@ -47,11 +47,11 @@ export default function App() {
     <>
       <div className="navbar">
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/plant/1">Plant 1</NavLink>
+        <NavLink to="setup/1/plant/1">Plant 1</NavLink>
       </div>
       <Outlet />
     </>
-);
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

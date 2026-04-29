@@ -5,17 +5,19 @@ import type { SensorReading } from "../../sensors/types";
 import "./basic-data.css";
 
 export default function BasicData() {
-  const { plantId } = useParams();
+  const { setupId, plantId } = useParams();
   const [reading, setReading] = useState<SensorReading | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!plantId) return;
+    if (!plantId || !setupId) return;
+
+    const setupIdNumber = parseInt(setupId);
 
     setLoading(true);
     // Assuming the sensorId maps to the plantId for now.
-    getLatestSensorReading(plantId)
+    getLatestSensorReading(setupIdNumber, "TEMPERATURE")
       .then((data) => {
         setReading(data);
         setLoading(false);
@@ -27,7 +29,8 @@ export default function BasicData() {
       });
   }, [plantId]);
 
-  if (loading) return <div className="basic-data-container">Loading sensor data...</div>;
+  if (loading)
+    return <div className="basic-data-container">Loading sensor data...</div>;
   if (error) return <div className="basic-data-error">{error}</div>;
 
   return (
@@ -35,9 +38,16 @@ export default function BasicData() {
       <h2 className="basic-data-title">Latest Sensor Readings</h2>
       {reading ? (
         <div className="sensor-reading-card">
-          <p><strong>Sensor ID:</strong> {reading.sensorId}</p>
-          <p><strong>Value:</strong> {reading.value}</p>
-          <p><strong>Timestamp:</strong> {new Date(reading.timestamp).toLocaleString()}</p>
+          <p>
+            <strong>Sensor ID:</strong> {reading.sensorId}
+          </p>
+          <p>
+            <strong>Value:</strong> {reading.value}
+          </p>
+          <p>
+            <strong>Timestamp:</strong>{" "}
+            {new Date(reading.timestamp).toLocaleString()}
+          </p>
         </div>
       ) : (
         <p>No sensor data available for this plant.</p>
@@ -45,4 +55,3 @@ export default function BasicData() {
     </div>
   );
 }
-
