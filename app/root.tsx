@@ -12,6 +12,16 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
+  { 
+    rel: "icon", 
+    href: "/LogoLight.svg",
+    media: "(prefers-color-scheme: light)" 
+  },
+  { 
+    rel: "icon", 
+    href: "/LogoDark.svg",
+    media: "(prefers-color-scheme: dark)" 
+  },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
