@@ -1,49 +1,44 @@
 import api from "../../../api/client";
 import type { GrowingSetup, SetupReading, WateringEvent, MoistureSensor } from "../types";
 
-export const setupsService = {
-  assignSetupToUser: async (userId: number, setupId: number): Promise<{ growingsetup: GrowingSetup }> => {
-    const response = await api.post<{ growingsetup: GrowingSetup }>("/growingsetups", { userId, setupId });
+export const growingSetupsService = {
+  assignSetupToUser: async (userId: number, setupId: number): Promise<{ growingSetup: GrowingSetup }> => {
+    const response = await api.post<{ growingSetup: GrowingSetup }>("/api/growingsetups", { userId, setupId });
     return response.data;
   },
 
-  disconnectSetupFromUser: async (userId: number, setupId: number): Promise<{ message: string }> => {
-    const response = await api.delete<{ message: string }>(`/growingsetups/${setupId}`, { data: { userId } });
+  updateSetupLocation: async (setupId: number, location: string): Promise<{ growingSetup: GrowingSetup }> => {
+    const response = await api.patch<{ growingSetup: GrowingSetup }>(`/api/growingsetups/${setupId}`, { location });
     return response.data;
   },
 
-  getSetupsByUserID: async (userId: number): Promise<{ growingsetup: GrowingSetup }[]> => {
-    const response = await api.get<{ growingsetup: GrowingSetup }[]>("/growingsetups", { params: { userId } });
+  disconnectSetupFromUser: async (setupId: number): Promise<{ message: string }> => {
+    const response = await api.delete<{ message: string }>(`/api/growingsetups/${setupId}`);
     return response.data;
   },
 
-  getSetupSensorReadings: async (setupId: number): Promise<{ reading: SetupReading }[]> => {
-    const response = await api.get<{ reading: SetupReading }[]>(`/growingsetups/${setupId}/readings/latest`);
+  getSetupsByUserID: async (userId: number): Promise<GrowingSetup[]> => {
+    const response = await api.get<GrowingSetup[]>("/api/growingsetups", { params: { userId } });
     return response.data;
   },
 
-  triggerManualWatering: async (setupId: number, isManual: boolean): Promise<{ message: string }> => {
-    const response = await api.post<{ message: string }>(`/growingsetups/${setupId}/manualWatering`, { manual: isManual });
-    return response.data;
-  },
-
-  isManualWatering: async (setupId: number): Promise<{ boolean: boolean }> => {
-    const response = await api.get<{ boolean: boolean }>(`/growingsetups/${setupId}/manualWatering`);
+  getSetupSensorReadings: async (setupId: number): Promise<SetupReading> => {
+    const response = await api.get<SetupReading>(`/api/growingsetups/${setupId}/readings/latest`);
     return response.data;
   },
 
   getLastWateringEvent: async (setupId: number): Promise<WateringEvent> => {
-    const response = await api.get<WateringEvent>(`/growingsetups/${setupId}/wateringEvents/latest`);
+    const response = await api.get<WateringEvent>(`/api/growingsetups/${setupId}/wateringEvents/latest`);
     return response.data;
   },
 
-  getHistoricalWateringEvents: async (setupId: number): Promise<{ wateringEvent: WateringEvent }[]> => {
-    const response = await api.get<{ wateringEvent: WateringEvent }[]>(`/growingsetups/${setupId}/wateringEvents`);
+  getHistoricalWateringEvents: async (setupId: number, from?: string, to?: string): Promise<WateringEvent[]> => {
+    const response = await api.get<WateringEvent[]>(`/api/growingsetups/${setupId}/wateringEvents`, { params: { from, to } });
     return response.data;
   },
 
-  fetchAllAssignedSensors: async (setupId: number): Promise<{ moistureSensor: MoistureSensor }[]> => {
-    const response = await api.get<{ moistureSensor: MoistureSensor }[]>(`/growingsetups/${setupId}/sensors`);
+  fetchAllAssignedSensors: async (setupId: number): Promise<MoistureSensor[]> => {
+    const response = await api.get<MoistureSensor[]>(`/api/growingsetups/${setupId}/sensors`);
     return response.data;
   },
 };
