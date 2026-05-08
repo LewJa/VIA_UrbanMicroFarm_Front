@@ -1,3 +1,4 @@
+// TODO: PlantService implemented
 import api from "../../../api/client.js";
 import type {
   SetupLatestReading,
@@ -5,6 +6,9 @@ import type {
   Plant,
   SensorReadingHistory,
 } from "../types.js";
+
+
+// 🌱 Get latest readings for setup
 
 export const getLatestSetupReadings = async (
   setupId: number,
@@ -15,6 +19,9 @@ export const getLatestSetupReadings = async (
   return response.data;
 };
 
+
+// 🌡️ Get latest sensor reading
+
 export const getLatestSensorReading = async (
   sensorId: number,
 ): Promise<SensorLatestReading> => {
@@ -24,10 +31,20 @@ export const getLatestSensorReading = async (
   return response.data;
 };
 
-export const getPlantsBySetup = async (setupId: number): Promise<Plant[]> => {
-  const response = await api.get<Plant[]>(`/growingsetups/${setupId}/plants`);
+
+// 🌿 Get plants in a setup
+
+export const getPlantsBySetup = async (
+  setupId: number,
+): Promise<Plant[]> => {
+  const response = await api.get<Plant[]>(
+    `/growingsetups/${setupId}/plants`,
+  );
   return response.data;
 };
+
+
+// 📊 Get sensor reading history
 
 export const getSensorReadingHistory = async (
   sensorId: number,
@@ -36,4 +53,13 @@ export const getSensorReadingHistory = async (
     `/sensors/${sensorId}/readings`,
   );
   return response.data;
+};
+
+
+// 💧 Trigger manual watering ⭐
+
+export const triggerManualWatering = async (
+  plantId: number,
+): Promise<void> => {
+  await api.post(`/plants/${plantId}/water`);
 };
