@@ -1,4 +1,4 @@
-import GrowingSetupCard from "../features/plants/components/GrowingSetupCard";
+import GrowingSetupCard from "../features/growingSetups/components/growing-setup-card";
 
 export default function Home() {
   return (
