@@ -1,16 +1,12 @@
-import type { Route } from "./+types/home";
-
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
-}
+import GrowingSetupCard from "../features/plants/components/GrowingSetupCard";
 
 export default function Home() {
   return (
-  <>
-  <a href="/plant/1" >Go to plant 1</a>
-  </>
-  )
+    <GrowingSetupCard
+      name="Growing setup"
+      temperature={22}
+      humidity={64}
+      light={68}
+    />
+  );
 }
