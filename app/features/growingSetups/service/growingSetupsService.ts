@@ -1,5 +1,5 @@
 import api from "../../../api/client";
-import type { GrowingSetup, SetupReading, WateringEvent, MoistureSensor } from "../types";
+import type { GrowingSetup, SetupReading, MoistureSensor } from "../types";
 
 export const growingSetupsService = {
   assignSetupToUser: async (userId: number, setupId: number): Promise<{ growingSetup: GrowingSetup }> => {
@@ -24,16 +24,6 @@ export const growingSetupsService = {
 
   getSetupSensorReadings: async (setupId: number): Promise<SetupReading> => {
     const response = await api.get<SetupReading>(`/api/growingsetups/${setupId}/readings/latest`);
-    return response.data;
-  },
-
-  getLastWateringEvent: async (setupId: number): Promise<WateringEvent> => {
-    const response = await api.get<WateringEvent>(`/api/growingsetups/${setupId}/wateringEvents/latest`);
-    return response.data;
-  },
-
-  getHistoricalWateringEvents: async (setupId: number, from?: string, to?: string): Promise<WateringEvent[]> => {
-    const response = await api.get<WateringEvent[]>(`/api/growingsetups/${setupId}/wateringEvents`, { params: { from, to } });
     return response.data;
   },
 
