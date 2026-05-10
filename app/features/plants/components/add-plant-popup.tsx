@@ -47,6 +47,9 @@ export function AddPlantModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (sensorId === null) return;
+
+    // TODO: implement SENSOR SERVICE - add plant to sensor
+
     onContinue({ name, type, sensorId });
     handleClose();
   };
