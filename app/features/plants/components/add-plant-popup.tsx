@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import "./add-growingsetup.css";
-import type { EntryIssuesMap } from "next/dist/shared/lib/turbopack/utils";
+import "~/features/growingSetups/components/add-growingsetup.css";
 import { growingSetupsService } from "~/features/growingSetups/service/growingSetupsService";
-import valueProcessor from "next/dist/build/webpack/loaders/resolve-url-loader/lib/value-processor";
 import type { MoistureSensor } from "~/features/growingSetups/types";
 
 interface AddPlantModalProps {
@@ -22,21 +20,36 @@ export function AddPlantModal({
 }: AddPlantModalProps) {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
-  const [sensorId, setSensorId] = useState<number>([]);
-  const [sensorList, setSensorList] = useState([]);
+  const [sensorId, setSensorId] = useState<number | null>(null);
+  const [sensorList, setSensorList] = useState<MoistureSensor[]>([]);
+
+  useEffect(() => {
+    const fetchSensors = async () => {
+      const sensors =
+        await growingSetupsService.fetchAllAssignedSensors(setupId);
+      setSensorList(sensors);
+    };
+
+    // TODO: change
+    // fetchSensors();
+    setSensorList([{ id: 1, status: "active" }]);
+  }, [setupId]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onContinue({ name, type, sensorId });
+  const handleClose = () => {
+    setName("");
+    setType("");
+    setSensorId(null);
+    onClose();
   };
 
-  useEffect(() => {
-    const setupSensors: MoistureSensor[] =
-      growingSetupsService.fetchAllAssignedSensors(setupId);
-    setSensorId(setupSensors.id);
-  });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (sensorId === null) return;
+    onContinue({ name, type, sensorId });
+    handleClose();
+  };
 
   return (
     <div className="modal-overlay">
@@ -53,9 +66,6 @@ export function AddPlantModal({
                 ✕
               </button>
             </div>
-
-            {/* <p className="modal-description">
-            </p> */}
 
             <div className="input-group">
               <label htmlFor="name" className="input-label">
@@ -93,14 +103,36 @@ export function AddPlantModal({
                 ))}
               </select>
             </div>
+
+            <div className="input-group">
+              <label htmlFor="sensorId" className="input-label">
+                Moisture sensor
+              </label>
+              <div className="flex flex-row">
+                {sensorList.map((sensor) => (
+                  <button
+                    className={`p-1 ${sensorId === sensor.id ? "bg-amber-400" : "bg-amber-100 hover:bg-amber-400"}`}
+                    key={sensor.id}
+                    type="button"
+                    onClick={() => {
+                      sensorId != sensor.id
+                        ? setSensorId(sensor.id)
+                        : setSensorId(null);
+                    }}
+                  >
+                    #{sensor.id}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="modal-footer">
-            <button type="button" onClick={onClose} className="btn-cancel">
+            <button type="button" onClick={handleClose} className="btn-cancel">
               Cancel
             </button>
             <button type="submit" className="btn-continue">
-              Continue &rarr;
+              Continue
             </button>
           </div>
         </form>
