@@ -1,43 +1,11 @@
-// TODO: PlantService implemented
+
 import api from "../../../api/client.js";
 import type {
-  SetupLatestReading,
-  SensorLatestReading,
+  
   Plant,
-  SensorReadingHistory,
+  
 } from "../types.js";
 
-
-
-
-
-// 🌡️ Get latest sensor reading
-
-export const getLatestSensorReading = async (
-  sensorId: number,
-): Promise<SensorLatestReading> => {
-  const response = await api.get<SensorLatestReading>(
-    `/sensors/${sensorId}/readings/latest`,
-  );
-
-  return response.data;
-};
-
-
-// 📊 Get sensor reading history
-
-export const getSensorReadingHistory = async (
-  sensorId: number,
-): Promise<SensorReadingHistory> => {
-  const response = await api.get<SensorReadingHistory>(
-    `/sensors/${sensorId}/readings`,
-  );
-
-  return response.data;
-};
-
-
-// 🌿 Get all plants in a setup
 
 export const getPlantsBySetup = async (
   setupId: number,
@@ -50,7 +18,7 @@ export const getPlantsBySetup = async (
 };
 
 
-// 🌱 Get a single plant by ID
+
 
 export const getPlant = async (
   plantId: number,
@@ -63,7 +31,7 @@ export const getPlant = async (
 };
 
 
-// 🌱 Get plant by sensor ID
+
 
 export const getPlantBySensor = async (
   sensorId: number,
@@ -75,8 +43,6 @@ export const getPlantBySensor = async (
   return response.data;
 };
 
-
-// 🌱 Add new plant
 
 export const addPlant = async (
   plantData: {
@@ -95,7 +61,7 @@ export const addPlant = async (
 };
 
 
-// 🌱 Update plant
+
 
 export const updatePlant = async (
   plantId: number,
@@ -113,7 +79,7 @@ export const updatePlant = async (
 };
 
 
-// 🌱 Remove plant
+
 
 export const removePlant = async (
   plantId: number,
@@ -124,5 +90,4 @@ export const removePlant = async (
 
   return response.data;
 };
-
 
