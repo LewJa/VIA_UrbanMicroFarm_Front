@@ -8,18 +8,7 @@ import type {
 } from "../types.js";
 
 
-// 🌱 Get latest readings for setup
-// NOTE: Should later be moved to GrowingSetupService
 
-export const getLatestSetupReadings = async (
-  setupId: number,
-): Promise<SetupLatestReading> => {
-  const response = await api.get<SetupLatestReading>(
-    `/growingsetups/${setupId}/readings/latest`,
-  );
-
-  return response.data;
-};
 
 
 // 🌡️ Get latest sensor reading
@@ -137,15 +126,3 @@ export const removePlant = async (
 };
 
 
-// 💧 Trigger manual watering
-// Fixed according to API contract
-
-export const triggerManualWatering = async (
-  plantId: number,
-): Promise<{ message: string }> => {
-  const response = await api.post<{ message: string }>(
-    `/plants/${plantId}/watering/manual`,
-  );
-
-  return response.data;
-};
