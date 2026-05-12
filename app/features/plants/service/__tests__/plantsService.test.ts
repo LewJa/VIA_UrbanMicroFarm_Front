@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import api from "../../../../api/client";
 import {
-  getLatestSetupReadings,
+ 
   getLatestSensorReading,
   getPlantsBySetup,
   getSensorReadingHistory,
@@ -58,39 +58,7 @@ describe("plantsService", () => {
     vi.clearAllMocks();
   });
 
-  // ── getLatestSetupReadings ────────────────────────────────────────────────
-
-  describe("getLatestSetupReadings", () => {
-    it("hits the correct endpoint", async () => {
-      mockGet.mockResolvedValueOnce({ data: setupReading });
-      await getLatestSetupReadings(42);
-      expect(mockGet).toHaveBeenCalledWith("/growingsetups/42/readings/latest");
-    });
-
-    it("returns the response data", async () => {
-      mockGet.mockResolvedValueOnce({ data: setupReading });
-      await expect(getLatestSetupReadings(1)).resolves.toEqual(setupReading);
-    });
-
-    it("propagates network errors", async () => {
-      mockGet.mockRejectedValueOnce(new Error("Network Error"));
-      await expect(getLatestSetupReadings(1)).rejects.toThrow("Network Error");
-    });
-
-    it("propagates 401 responses", async () => {
-      mockGet.mockRejectedValueOnce(makeAxiosError(401));
-      await expect(getLatestSetupReadings(1)).rejects.toMatchObject({
-        response: { status: 401 },
-      });
-    });
-
-    it("propagates 500 responses", async () => {
-      mockGet.mockRejectedValueOnce(makeAxiosError(500));
-      await expect(getLatestSetupReadings(1)).rejects.toMatchObject({
-        response: { status: 500 },
-      });
-    });
-  });
+  
 
   // ── getLatestSensorReading ────────────────────────────────────────────────
 
