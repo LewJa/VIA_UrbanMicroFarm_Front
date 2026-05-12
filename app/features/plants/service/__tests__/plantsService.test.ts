@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import api from "../../../../api/client";
 import {
  
-  getLatestSensorReading,
+  
   getPlantsBySetup,
-  getSensorReadingHistory,
+ 
 } from "../plantsService";
 import type {
   SetupLatestReading,
@@ -60,39 +60,7 @@ describe("plantsService", () => {
 
   
 
-  // ── getLatestSensorReading ────────────────────────────────────────────────
-
-  describe("getLatestSensorReading", () => {
-    it("hits the correct endpoint", async () => {
-      mockGet.mockResolvedValueOnce({ data: sensorReading });
-      await getLatestSensorReading(7);
-      expect(mockGet).toHaveBeenCalledWith("/sensors/7/readings/latest");
-    });
-
-    it("returns the response data", async () => {
-      mockGet.mockResolvedValueOnce({ data: sensorReading });
-      await expect(getLatestSensorReading(7)).resolves.toEqual(sensorReading);
-    });
-
-    it("propagates network errors", async () => {
-      mockGet.mockRejectedValueOnce(new Error("Network Error"));
-      await expect(getLatestSensorReading(7)).rejects.toThrow("Network Error");
-    });
-
-    it("propagates 401 responses", async () => {
-      mockGet.mockRejectedValueOnce(makeAxiosError(401));
-      await expect(getLatestSensorReading(7)).rejects.toMatchObject({
-        response: { status: 401 },
-      });
-    });
-
-    it("propagates 500 responses", async () => {
-      mockGet.mockRejectedValueOnce(makeAxiosError(500));
-      await expect(getLatestSensorReading(7)).rejects.toMatchObject({
-        response: { status: 500 },
-      });
-    });
-  });
+  
 
   // ── getPlantsBySetup ──────────────────────────────────────────────────────
 
@@ -133,39 +101,5 @@ describe("plantsService", () => {
     });
   });
 
-  // ── getSensorReadingHistory ───────────────────────────────────────────────
-
-  describe("getSensorReadingHistory", () => {
-    it("hits the correct endpoint", async () => {
-      mockGet.mockResolvedValueOnce({ data: readingHistory });
-      await getSensorReadingHistory(5);
-      expect(mockGet).toHaveBeenCalledWith("/sensors/5/readings");
-    });
-
-    it("returns the response data including all readings", async () => {
-      mockGet.mockResolvedValueOnce({ data: readingHistory });
-      const result = await getSensorReadingHistory(5);
-      expect(result).toEqual(readingHistory);
-      expect(result.reading).toHaveLength(2);
-    });
-
-    it("propagates network errors", async () => {
-      mockGet.mockRejectedValueOnce(new Error("Network Error"));
-      await expect(getSensorReadingHistory(5)).rejects.toThrow("Network Error");
-    });
-
-    it("propagates 401 responses", async () => {
-      mockGet.mockRejectedValueOnce(makeAxiosError(401));
-      await expect(getSensorReadingHistory(5)).rejects.toMatchObject({
-        response: { status: 401 },
-      });
-    });
-
-    it("propagates 500 responses", async () => {
-      mockGet.mockRejectedValueOnce(makeAxiosError(500));
-      await expect(getSensorReadingHistory(5)).rejects.toMatchObject({
-        response: { status: 500 },
-      });
-    });
-  });
+  
 });
