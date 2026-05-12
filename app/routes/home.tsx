@@ -6,8 +6,9 @@ import type {GrowingSetup, SetupReading} from "~/features/growingSetups/types";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userId, setUserId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<number | null>(1);
   const [growingSetups, setGrowingSetups] = useState<GrowingSetup[]>([]);
+  const [growingSetupError, setGrowingSetupError] = useState(null);
 
   const [userName, setUserName] = useState("Anya");
   const [welcomeText, setWelcomeText] = useState(`Good morning, `);
@@ -38,6 +39,7 @@ export default function Home() {
 
         const fetchGrowingSetups = async () => {
             const setups = await growingSetupsService.getSetupsByUserID(userId);
+            // catch error if any
             setGrowingSetups(setups);
         };
 
@@ -75,12 +77,24 @@ export default function Home() {
                             <GrowingSetupCard
                                 key={setup.id}
                                 setupId={setup.id}
-                                name={setup.location}
+                                locationName={setup.location}
                             />
                         ))
                     }
                     </div>
-                ) : (
+                ) : growingSetupError ?
+                (
+                    <div className="flex flex-col align-middle justify-center items-center
+                    p-6 m-6 w-1/2 border-2 rounded-2xl border-dashed border-red-200 bg-red-50">
+                        {/*<img className="h-10 w-auto my-3" src={"public/LogoLight.svg"}/>*/}
+                        <h2 className="font-bold text-red-900">Error</h2>
+                        <p className="text-sm" >Unable to load growing setups. Try again and reload page.</p>
+
+                        <button className="rounded-2xl py-1 my-3 w-1/2 bg-red-900 text-gray-100 text-sm" onClick={() => location.reload() }>Refresh page</button>
+                    </div>
+                )
+                :
+                (
                     <div className="flex flex-col align-middle justify-center items-center
                     p-6 m-6 w-1/2 border-2 rounded-2xl border-dashed border-amber-200 bg-amber-50">
                         <img className="h-10 w-auto my-3" src={"public/LogoLight.svg"}/>

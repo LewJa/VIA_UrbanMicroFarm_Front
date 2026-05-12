@@ -4,12 +4,12 @@ import {growingSetupsService} from "~/features/growingSetups/service/growingSetu
 
 type GrowingSetupCardProps = {
     setupId: number;
-  name: string;
+  locationName: string;
 };
 
 export default function GrowingSetupCard({
                                              setupId,
-  name,
+  locationName,
 }: GrowingSetupCardProps) {
 
     const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ export default function GrowingSetupCard({
 
   return (
     <div>
-      <h1>{name}</h1>
+      <h1>{locationName}</h1>
 
         {setupReadings ? (
             <>
