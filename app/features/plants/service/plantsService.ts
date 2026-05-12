@@ -21,6 +21,7 @@ export const getLatestSetupReadings = async (
 
 
 // 🌡️ Get latest sensor reading
+// TODO: superseded by sensorService.getLatestReading — remove this once callers are migrated
 
 export const getLatestSensorReading = async (
   sensorId: number,
@@ -45,6 +46,7 @@ export const getPlantsBySetup = async (
 
 
 // 📊 Get sensor reading history
+// TODO: superseded by sensorService.getReadings — remove this once callers are migrated
 
 export const getSensorReadingHistory = async (
   sensorId: number,
