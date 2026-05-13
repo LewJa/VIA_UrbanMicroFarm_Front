@@ -1,5 +1,5 @@
-import api from "../../../api/client";
-import type { GrowingSetup, SetupReading, MoistureSensor } from "../types";
+import api from "../api/client";
+import type { GrowingSetup, SetupReading, MoistureSensor } from "../model/growingSetup/types";
 
 export const growingSetupsService = {
   assignSetupToUser: async (userId: number, setupId: number): Promise<{ growingSetup: GrowingSetup }> => {

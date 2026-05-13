@@ -1,11 +1,11 @@
 // TODO: PlantService implemented
-import api from "../../../api/client.js";
+import api from "../api/client";
 import type {
   SetupLatestReading,
   SensorLatestReading,
   Plant,
   SensorReadingHistory,
-} from "../types.js";
+} from "../model/plant/types";
 
 
 // 🌱 Get latest readings for setup

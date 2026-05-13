@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import api from "../../../../api/client";
+import api from "../../api/client";
 import {
   getLatestSetupReadings,
   getLatestSensorReading,
@@ -11,7 +11,7 @@ import type {
   SensorLatestReading,
   Plant,
   SensorReadingHistory,
-} from "../../types";
+} from "../../model/plant/types";
 
 vi.mock("../../../../api/client", () => ({
   default: { get: vi.fn() },

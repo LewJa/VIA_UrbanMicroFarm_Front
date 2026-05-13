@@ -1,4 +1,4 @@
-import api from "../../../api/client";
+import api from "../api/client";
 import type {
   RegisterRequest,
   LoginRequest,
@@ -8,7 +8,7 @@ import type {
   ChangePasswordRequest,
   ChangeEmailRequest,
   SetThemeRequest,
-} from "../types";
+} from "../model/user/types";
 
 export const userService = {
   register: async (data: RegisterRequest): Promise<{ message: string }> => {

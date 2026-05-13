@@ -1,10 +1,10 @@
-import api from "../../../api/client";
+import api from "../api/client";
 import type {
   SensorReading,
   SensorHistoricalReading,
   SensorReadingsParams,
   SensorPlant,
-} from "../types";
+} from "../model/sensor/types";
 
 export const sensorService = {
   getLatestReading: async (sensorId: number): Promise<SensorReading> => {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./add-growingsetup.css";
+import "./styles/add-growingsetup.css";
 
 interface AddGrowingSetupModalProps {
   isOpen: boolean;

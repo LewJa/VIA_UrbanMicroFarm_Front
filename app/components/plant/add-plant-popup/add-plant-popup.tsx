@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import "~/features/growingSetups/components/add-growingsetup.css";
-import { growingSetupsService } from "~/features/growingSetups/service/growingSetupsService";
-import type { MoistureSensor } from "~/features/growingSetups/types";
+import "~/components/growingSetup/styles/add-growingsetup.css";
+import { growingSetupsService } from "~/services/growingSetupsService";
+import type { MoistureSensor } from "~/model/growingSetup/types";
 
 interface AddPlantModalProps {
   isOpen: boolean;

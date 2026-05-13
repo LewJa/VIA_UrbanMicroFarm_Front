@@ -1,5 +1,5 @@
-import api from "../../../api/client";
-import type { WateringEvent } from "../../growingSetups/types";
+import api from "../api/client";
+import type { WateringEvent } from "../model/growingSetup/types";
 
 export const wateringService = {
   triggerManualWatering: async (plantId: number): Promise<{ message: string }> => {

@@ -1,5 +1,5 @@
 import type { Route } from "./+types/plant";
-import { PlantLayout } from "../features/plants/components/plant-layout";
+import { PlantLayout } from "../components/plant/plant-subpages/plant-layout";
 
 export async function clientLoader({ params }: Route.LoaderArgs) {
     const plantId = params.plantId;

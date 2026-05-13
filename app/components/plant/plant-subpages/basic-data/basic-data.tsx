@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { getLatestSensorReading } from "../../sensors/service/sensorsService";
-import type { SensorReading } from "../../sensors/types";
+import type { SensorReading } from "../../../../model/sensor/types";
 import "./basic-data.css";
 
 export default function BasicData() {
