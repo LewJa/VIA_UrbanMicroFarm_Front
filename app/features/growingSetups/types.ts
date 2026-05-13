@@ -5,6 +5,7 @@ export interface GrowingSetup {
 }
 
 export interface SetupReading {
+  setupId: number;
   timestamp: string;
   temperature: number;
   humidity: number;
