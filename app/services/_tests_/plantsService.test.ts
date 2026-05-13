@@ -13,7 +13,7 @@ import type {
   SensorReadingHistory,
 } from "../../model/plant/types";
 
-vi.mock("../../../../api/client", () => ({
+vi.mock("../../api/client", () => ({
   default: { get: vi.fn() },
 }));
 

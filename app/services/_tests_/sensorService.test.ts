@@ -3,7 +3,7 @@ import api from "../../api/client";
 import { sensorService } from "../sensorService";
 import type { SensorReading, SensorHistoricalReading, SensorPlant } from "../../model/sensor/types";
 
-vi.mock("../../../../api/client", () => ({
+vi.mock("../../api/client", () => ({
   default: { get: vi.fn() },
 }));
 
