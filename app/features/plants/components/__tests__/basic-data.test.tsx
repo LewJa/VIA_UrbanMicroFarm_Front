@@ -12,13 +12,10 @@ vi.mock("react-router", () => ({
   }),
 }));
 
-vi.mock("../../../sensors/service/sensorsService", () => {
-  return {
-    getLatestSensorReading: vi.fn(),
-  };
-});
+import * as sensorService from "../../../sensors/service/setupSensorService";
 
-import * as sensorService from "../../../sensors/service/sensorsService";
+vi.spyOn(sensorService, "getLatestSensorReading");
+
 import BasicData from "../basic-data";
 
 describe("BasicData Component", () => {
@@ -29,7 +26,7 @@ describe("BasicData Component", () => {
 
   it("displays loading state initially", () => {
 
-    vi.mocked(sensorService.getLatestSensorReading)
+    (sensorService.getLatestSensorReading as any)
       .mockImplementation(() => new Promise(() => {}));
 
     render(<BasicData />);
@@ -41,7 +38,7 @@ describe("BasicData Component", () => {
 
   it("displays sensor reading correctly", async () => {
 
-    vi.mocked(sensorService.getLatestSensorReading)
+    (sensorService.getLatestSensorReading as any)
       .mockResolvedValue({
         sensorId: "7",
         value: 512,
@@ -57,8 +54,8 @@ describe("BasicData Component", () => {
 
   it("displays no data state", async () => {
 
-    vi.mocked(sensorService.getLatestSensorReading)
-      .mockResolvedValue(null as any);
+    (sensorService.getLatestSensorReading as any)
+      .mockResolvedValue(null);
 
     render(<BasicData />);
 
@@ -73,7 +70,7 @@ describe("BasicData Component", () => {
 
   it("displays error state", async () => {
 
-    vi.mocked(sensorService.getLatestSensorReading)
+    (sensorService.getLatestSensorReading as any)
       .mockRejectedValue(new Error("API Error"));
 
     render(<BasicData />);
