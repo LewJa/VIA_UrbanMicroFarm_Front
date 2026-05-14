@@ -20,6 +20,17 @@ export const sensorService = {
     return response.data;
   },
 
+  getHistoricalReadings: async (
+    sensorId: number,
+    { from, to }: { from: string; to: string },
+  ): Promise<SensorHistoricalReading[]> => {
+    const response = await api.get<SensorHistoricalReading[]>(
+      `/api/sensors/${sensorId}/readings`,
+      { params: { from, to } },
+    );
+    return response.data;
+  },
+
   getPlant: async (sensorId: number): Promise<SensorPlant> => {
     if (isMockEnabled) return MockService.getPlant(sensorId);
     const response = await api.get<SensorPlant>(`/api/sensors/${sensorId}/plant`);
