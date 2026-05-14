@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import api from "../../../../api/client";
-import { sensorService } from "../sensorService";
+import { sensorService } from "../singleSensorService";
 import type { SensorReading, SensorHistoricalReading, SensorPlant } from "../../types";
 
 vi.mock("../../../../api/client", () => ({
