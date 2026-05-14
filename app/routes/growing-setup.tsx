@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-import { AddPlantModal } from "../features/plants/components/add-plant-popup";
+import { AddPlantModal } from "../components/plant/add-plant-popup/add-plant-popup";
 
-import { growingSetupsService } from "../features/growingSetups/service/growingSetupsService";
+import { growingSetupsService } from "../services/growingSetupsService";
 
-import type { SetupLatestReading } from "../features/plants/types";
+import type { SetupLatestReading } from "../model/plant/types";
 
-import type { MoistureSensor } from "../features/growingSetups/types";
+import type { MoistureSensor } from "../model/growingSetup/types";
 
 export default function GrowingSetupPage() {
 
