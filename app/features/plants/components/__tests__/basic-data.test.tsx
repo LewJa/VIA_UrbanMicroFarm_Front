@@ -18,7 +18,7 @@ vi.mock("../../../sensors/service/sensorsService", () => ({
   getLatestSensorReading: mockGetLatestSensorReading,
 }));
 
-import BasicData from "../basic-data";
+import BasicData from "../BasicData";
 
 describe("BasicData Component", () => {
 
