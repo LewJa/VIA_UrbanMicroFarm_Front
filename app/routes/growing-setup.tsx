@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+  import React, { useEffect, useState } from "react";
 
 import { AddPlantModal } from "../components/plant/add-plant-popup/add-plant-popup";
 
 import { growingSetupsService } from "../services/growingSetupsService";
 
-import type { SetupLatestReading } from "../model/plant/types";
+import type { SetupReading } from "../model/growingSetup/types";
 
 import type { MoistureSensor } from "../model/growingSetup/types";
 
 export default function GrowingSetupPage() {
 
   const [reading, setReading] =
-    useState<SetupLatestReading | null>(null);
+    useState<SetupReading | null>(null);
 
   const [sensors, setSensors] =
     useState<MoistureSensor[]>([]);
@@ -28,43 +28,17 @@ export default function GrowingSetupPage() {
 
       try {
 
-        // MOCK DATA
+        const readingData =
+          await growingSetupsService
+            .getSetupSensorReadings(1);
 
-        const mockReading: SetupLatestReading = {
-          timestamp: "2025-01-01T00:00:00Z",
-          temperature: 22,
-          humidity: 64,
-          light: 68,
-        };
+        const sensorData =
+          await growingSetupsService
+            .fetchAllAssignedSensors(1);
 
-        const mockSensors: MoistureSensor[] = [
-          {
-            id: 1,
-            status: "ACTIVE",
-          },
-          {
-            id: 2,
-            status: "ACTIVE",
-          },
-        ];
+        setReading(readingData);
 
-        setReading(mockReading);
-
-        setSensors(mockSensors);
-
-        // REAL API LATER
-
-        // const readingData =
-        //   await growingSetupsService
-        //     .getSetupSensorReadings(1);
-
-        // const sensorData =
-        //   await growingSetupsService
-        //     .fetchAllAssignedSensors(1);
-
-        // setReading(readingData);
-
-        // setSensors(sensorData);
+        setSensors(sensorData);
 
       } catch (error) {
 
