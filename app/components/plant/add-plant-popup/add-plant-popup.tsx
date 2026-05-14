@@ -132,6 +132,20 @@ export function AddPlantModal({
                 </div>
 
                 <div className="input-group">
+                  <label htmlFor="description" className="input-label">
+                    Name
+                  </label>
+                  <textarea
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Enter your plant details and notes"
+                      className="modal-input"
+                      required
+                  />
+                </div>
+
+                <div className="input-group">
                   <label htmlFor="sensorId" className="input-label">
                     Moisture sensor
                   </label>
