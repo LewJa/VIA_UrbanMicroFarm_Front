@@ -1,4 +1,3 @@
-// TODO: PlantService implemented
 import api from "../../../api/client.js";
 import type {
   SetupLatestReading,
@@ -6,6 +5,12 @@ import type {
   Plant,
   SensorReadingHistory,
 } from "../types.js";
+
+
+export const getPlantById = async (plantId: number): Promise<Plant> => {
+  const response = await api.get<Plant>(`/api/plants/${plantId}`);
+  return response.data;
+};
 
 
 // 🌱 Get latest readings for setup

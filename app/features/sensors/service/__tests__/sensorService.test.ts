@@ -166,4 +166,45 @@ describe("sensorService", () => {
       await expect(sensorService.getPlant(7)).rejects.toThrow("Network Error");
     });
   });
+
+  // ── getHistoricalReadings ─────────────────────────────────────────────────
+
+  describe("getHistoricalReadings", () => {
+    const from = "2024-01-08T00:00:00Z";
+    const to = "2024-01-15T00:00:00Z";
+
+    it("hits GET /api/sensors/:sensorId/readings with from and to params", async () => {
+      mockGet.mockResolvedValueOnce({ data: historicalReadings });
+      await sensorService.getHistoricalReadings(7, { from, to });
+      expect(mockGet).toHaveBeenCalledWith("/api/sensors/7/readings", {
+        params: { from, to },
+      });
+    });
+
+    it("returns an array of historical readings", async () => {
+      mockGet.mockResolvedValueOnce({ data: historicalReadings });
+      const result = await sensorService.getHistoricalReadings(7, { from, to });
+      expect(result).toEqual(historicalReadings);
+    });
+
+    it("returns an empty array when no readings exist in the range", async () => {
+      mockGet.mockResolvedValueOnce({ data: [] });
+      const result = await sensorService.getHistoricalReadings(7, { from, to });
+      expect(result).toEqual([]);
+    });
+
+    it("propagates 401 errors", async () => {
+      mockGet.mockRejectedValueOnce(makeAxiosError(401));
+      await expect(
+        sensorService.getHistoricalReadings(7, { from, to }),
+      ).rejects.toMatchObject({ response: { status: 401 } });
+    });
+
+    it("propagates network errors", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Network Error"));
+      await expect(
+        sensorService.getHistoricalReadings(7, { from, to }),
+      ).rejects.toThrow("Network Error");
+    });
+  });
 });

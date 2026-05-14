@@ -1,3 +1,28 @@
+import { useOutletContext } from "react-router";
+import SoilMoistureHistoryChart from "./SoilMoistureHistoryChart";
+import type { PlantContext } from "./plant-layout";
+
 export default function HistoricalData() {
-  return <>Welcome to Historical Data</>
+  const { plant, plantLoading, plantError } = useOutletContext<PlantContext>();
+
+  if (plantLoading) {
+    return (
+      <div aria-busy="true" aria-label="Loading plant data">
+        Loading plant data…
+      </div>
+    );
+  }
+
+  if (plantError) {
+    return <div role="alert">{plantError}</div>;
+  }
+
+  if (!plant) return null;
+
+  return (
+    <SoilMoistureHistoryChart
+      sensorId={plant.sensorId}
+      plantName={plant.name}
+    />
+  );
 }

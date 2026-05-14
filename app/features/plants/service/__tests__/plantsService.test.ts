@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import api from "../../../../api/client";
 import {
+  getPlantById,
   getLatestSetupReadings,
   getLatestSensorReading,
   getPlantsBySetup,
@@ -35,6 +36,7 @@ const sensorReading: SensorLatestReading = {
 const plants: Plant[] = [
   {
     id: 1,
+    sensorId: 10,
     name: "Basil",
     description: "Mediterranean herb",
     type: "herb",
@@ -198,6 +200,60 @@ describe("plantsService", () => {
       await expect(getSensorReadingHistory(5)).rejects.toMatchObject({
         response: { status: 500 },
       });
+    });
+  });
+
+  // ── getPlantById ──────────────────────────────────────────────────────────
+
+  describe("getPlantById", () => {
+    const plant: Plant = {
+      id: 7,
+      sensorId: 42,
+      name: "Basil",
+      description: "Mediterranean herb",
+      type: "herb",
+      datePlanted: "2024-01-01",
+      status: "growing",
+    };
+
+    it("hits GET /api/plants/:plantId", async () => {
+      mockGet.mockResolvedValueOnce({ data: plant });
+      await getPlantById(7);
+      expect(mockGet).toHaveBeenCalledWith("/api/plants/7");
+    });
+
+    it("returns the plant including sensorId", async () => {
+      mockGet.mockResolvedValueOnce({ data: plant });
+      const result = await getPlantById(7);
+      expect(result).toEqual(plant);
+      expect(result.sensorId).toBe(42);
+    });
+
+    it("sensorId is distinct from plant id", async () => {
+      mockGet.mockResolvedValueOnce({ data: plant });
+      const result = await getPlantById(7);
+      expect(result.id).toBe(7);
+      expect(result.sensorId).toBe(42);
+      expect(result.id).not.toBe(result.sensorId);
+    });
+
+    it("propagates 404 when plant does not exist", async () => {
+      mockGet.mockRejectedValueOnce(makeAxiosError(404));
+      await expect(getPlantById(999)).rejects.toMatchObject({
+        response: { status: 404 },
+      });
+    });
+
+    it("propagates 401 errors", async () => {
+      mockGet.mockRejectedValueOnce(makeAxiosError(401));
+      await expect(getPlantById(7)).rejects.toMatchObject({
+        response: { status: 401 },
+      });
+    });
+
+    it("propagates network errors", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Network Error"));
+      await expect(getPlantById(7)).rejects.toThrow("Network Error");
     });
   });
 });
