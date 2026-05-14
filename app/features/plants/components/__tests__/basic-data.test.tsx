@@ -12,11 +12,13 @@ vi.mock("react-router", () => ({
   }),
 }));
 
-vi.mock("../../../sensors/service/sensorsService", () => ({
-  getLatestSensorReading: vi.fn(),
-}));
+vi.mock("../../../sensors/service/sensorsService", () => {
+  return {
+    getLatestSensorReading: vi.fn(),
+  };
+});
 
-import { getLatestSensorReading } from "../../../sensors/service/sensorsService";
+import * as sensorService from "../../../sensors/service/sensorsService";
 import BasicData from "../basic-data";
 
 describe("BasicData Component", () => {
@@ -27,9 +29,8 @@ describe("BasicData Component", () => {
 
   it("displays loading state initially", () => {
 
-    vi.mocked(getLatestSensorReading).mockImplementation(
-      () => new Promise(() => {})
-    );
+    vi.mocked(sensorService.getLatestSensorReading)
+      .mockImplementation(() => new Promise(() => {}));
 
     render(<BasicData />);
 
@@ -40,24 +41,24 @@ describe("BasicData Component", () => {
 
   it("displays sensor reading correctly", async () => {
 
-    vi.mocked(getLatestSensorReading).mockResolvedValue({
-      sensorId: "7",
-      value: 512,
-      timestamp: "2024-01-15T10:30:00Z",
-    });
+    vi.mocked(sensorService.getLatestSensorReading)
+      .mockResolvedValue({
+        sensorId: "7",
+        value: 512,
+        timestamp: "2024-01-15T10:30:00Z",
+      });
 
     render(<BasicData />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/512/)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/512/)).toBeInTheDocument();
     });
   });
 
   it("displays no data state", async () => {
 
-    vi.mocked(getLatestSensorReading).mockResolvedValue(null as any);
+    vi.mocked(sensorService.getLatestSensorReading)
+      .mockResolvedValue(null as any);
 
     render(<BasicData />);
 
@@ -72,9 +73,8 @@ describe("BasicData Component", () => {
 
   it("displays error state", async () => {
 
-    vi.mocked(getLatestSensorReading).mockRejectedValue(
-      new Error("API Error")
-    );
+    vi.mocked(sensorService.getLatestSensorReading)
+      .mockRejectedValue(new Error("API Error"));
 
     render(<BasicData />);
 
