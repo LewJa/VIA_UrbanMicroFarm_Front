@@ -1,5 +1,5 @@
-import api from "../../../api/client.js";
-import type { SensorReading } from "../types.js";
+import api from "../../../api/client";
+import type { SensorReading } from "../types";
 
 export const getLatestSensorReading = async (
   setupId: number,
