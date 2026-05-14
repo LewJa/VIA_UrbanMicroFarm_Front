@@ -15,7 +15,7 @@ import * as sensorService from "../../../../services/sensorService";
 
 vi.spyOn(sensorService.sensorService, "getLatestReading");
 
-import BasicData from "../basicdata";
+import BasicData from "../basic-data";
 
 describe("BasicData Component", () => {
 
