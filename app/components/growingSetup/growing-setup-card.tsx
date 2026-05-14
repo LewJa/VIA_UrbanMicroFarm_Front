@@ -1,6 +1,6 @@
-import type {SetupReading} from "~/features/growingSetups/types";
+import type {SetupReading} from "~/model/growingSetup/types";
 import {useEffect, useState} from "react";
-import {growingSetupsService} from "~/features/growingSetups/service/growingSetupsService";
+import {growingSetupsService} from "~/services/growingSetupsService";
 
 type GrowingSetupCardProps = {
     setupId: number;

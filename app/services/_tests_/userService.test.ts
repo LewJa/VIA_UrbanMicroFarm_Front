@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import api from "../../../../api/client";
+import api from "../../api/client";
 import { userService } from "../userService";
-import type { LoginResponse, UserProfile, UserWithName } from "../../types";
+import type { LoginResponse, UserProfile, UserWithName } from "../../model/user/types";
 
-vi.mock("../../../../api/client", () => ({
+vi.mock("../../api/client", () => ({
   default: {
     post: vi.fn(),
     delete: vi.fn(),

@@ -1,23 +1,29 @@
 ﻿import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+<<<<<<< HEAD:app/features/plants/components/basic-data.tsx
 import { getLatestSensorReading } from "../../sensors/service/setupSensorService";
 import type { SensorReading } from "../../sensors/types";
+=======
+import { sensorService } from "../../../../services/sensorService";
+import type { SensorReading } from "../../../../model/sensor/types";
+>>>>>>> origin/dev:app/components/plant/plant-subpages/basic-data/basic-data.tsx
 import "./basic-data.css";
 
 export default function BasicData() {
-  const { setupId, plantId } = useParams();
+  const { setupId, sensorId, plantId } = useParams();
   const [reading, setReading] = useState<SensorReading | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!plantId || !setupId) return;
+    if (!plantId || !setupId || !sensorId) return;
 
     const setupIdNumber = parseInt(setupId);
+    const sensorIdNumber = parseInt(sensorId);
 
     setLoading(true);
     // Assuming the sensorId maps to the plantId for now.
-    getLatestSensorReading(setupIdNumber, "TEMPERATURE")
+    sensorService.getLatestReading(sensorIdNumber)
       .then((data) => {
         setReading(data);
         setLoading(false);

@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from "react-router";
 import { useState } from "react";
-import { wateringService } from "../../watering/service/wateringService";
+import { wateringService } from "../../../services/wateringService";
 // Import the image directly so the bundler handles it
 import plantImg from "../../../assets/plant.png";
 import "./plant-layout.css";

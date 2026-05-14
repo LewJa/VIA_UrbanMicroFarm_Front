@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import {growingSetupsService} from "~/features/growingSetups/service/growingSetupsService";
-import GrowingSetupCard from "../features/growingSetups/components/growing-setup-card";
-import {AddGrowingSetupModal} from "~/features/growingSetups/components/add-growingsetup";
-import type {GrowingSetup, SetupReading} from "~/features/growingSetups/types";
+import {growingSetupsService} from "~/services/growingSetupsService";
+import GrowingSetupCard from "../components/growingSetup/growing-setup-card";
+import {AddGrowingSetupModal} from "~/components/growingSetup/add-growingsetup";
+import type {GrowingSetup, SetupReading} from "~/model/growingSetup/types";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
