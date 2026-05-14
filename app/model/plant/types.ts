@@ -1,5 +1,6 @@
 export interface Plant {
   id: number;
+  sensorId: number;
   name: string;
   description: string;
   type: string;
