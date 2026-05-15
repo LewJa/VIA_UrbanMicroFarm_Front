@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+  import React, { useEffect, useState } from "react";
 
-import { AddPlantModal } from "../features/plants/components/add-plant-popup";
+import { AddPlantModal } from "../components/plant/add-plant-popup/add-plant-popup";
 
-import { growingSetupsService } from "../features/growingSetups/service/growingSetupsService";
+import { growingSetupsService } from "../services/growingSetupsService";
 
-import type { SetupLatestReading } from "../features/plants/types";
+import type { SetupReading } from "../model/growingSetup/types";
 
-import type { MoistureSensor } from "../features/growingSetups/types";
+import type { MoistureSensor } from "../model/growingSetup/types";
 
 export default function GrowingSetupPage() {
 
   const [reading, setReading] =
-    useState<SetupLatestReading | null>(null);
+    useState<SetupReading | null>(null);
 
   const [sensors, setSensors] =
     useState<MoistureSensor[]>([]);
@@ -30,41 +30,41 @@ export default function GrowingSetupPage() {
 
         // MOCK DATA
 
-        const mockReading: SetupLatestReading = {
-          timestamp: "2025-01-01T00:00:00Z",
-          temperature: 22,
-          humidity: 64,
-          light: 68,
-        };
+        // const mockReading: SetupReading = {
+        //   setupId: 1,
+        //   timestamp: "2025-01-01T00:00:00Z",
+        //   temperature: 22,
+        //   humidity: 64,
+        //   light: 68,
+        // };
+        //
+        // const mockSensors: MoistureSensor[] = [
+        //   {
+        //     id: 1,
+        //     status: "ACTIVE",
+        //   },
+        //   {
+        //     id: 2,
+        //     status: "ACTIVE",
+        //   },
+        // ];
+        //
+        // setReading(mockReading);
 
-        const mockSensors: MoistureSensor[] = [
-          {
-            id: 1,
-            status: "ACTIVE",
-          },
-          {
-            id: 2,
-            status: "ACTIVE",
-          },
-        ];
-
-        setReading(mockReading);
-
-        setSensors(mockSensors);
+        // setSensors(mockSensors);
 
         // REAL API LATER
+        const readingData =
+          await growingSetupsService
+            .getSetupSensorReadings(1);
 
-        // const readingData =
-        //   await growingSetupsService
-        //     .getSetupSensorReadings(1);
+        const sensorData =
+          await growingSetupsService
+            .fetchAllAssignedSensors(1);
 
-        // const sensorData =
-        //   await growingSetupsService
-        //     .fetchAllAssignedSensors(1);
+        setReading(readingData);
 
-        // setReading(readingData);
-
-        // setSensors(sensorData);
+        setSensors(sensorData);
 
       } catch (error) {
 

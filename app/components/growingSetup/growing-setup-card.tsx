@@ -24,7 +24,7 @@ export default function GrowingSetupCard({
 
         fetchReadings();
 
-    }, [loading, setupReadings]);
+    }, [setupId]);
 
   return (
     <div>
