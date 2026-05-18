@@ -1,11 +1,13 @@
-﻿import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { useParams, useOutletContext } from "react-router";
 import { sensorService } from "../../../../services/sensorService";
 import type { SensorReading } from "../../../../model/sensor/types";
+import type { PlantContext } from "../plant-layout";
 import "./basic-data.css";
 
 export default function BasicData() {
   const { setupId, sensorId, plantId } = useParams();
+  const { plant } = useOutletContext<PlantContext>();
   const [reading, setReading] = useState<SensorReading | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,11 +15,9 @@ export default function BasicData() {
   useEffect(() => {
     if (!plantId || !setupId || !sensorId) return;
 
-    const setupIdNumber = parseInt(setupId);
     const sensorIdNumber = parseInt(sensorId);
 
     setLoading(true);
-    // Assuming the sensorId maps to the plantId for now.
     sensorService.getLatestReading(sensorIdNumber)
       .then((data) => {
         setReading(data);
@@ -36,7 +36,9 @@ export default function BasicData() {
 
   return (
     <div className="basic-data-container">
-      <h2 className="basic-data-title">Latest Sensor Readings</h2>
+      <h2 className="basic-data-title">
+        {plant ? `${plant.name} — Latest Readings` : "Latest Sensor Readings"}
+      </h2>
       {reading ? (
         <div className="sensor-reading-card">
           <p>
