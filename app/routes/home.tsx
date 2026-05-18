@@ -86,7 +86,7 @@ export default function Home() {
                 (
                     <div className="flex flex-col align-middle justify-center items-center
                     p-6 m-6 w-1/2 border-2 rounded-2xl border-dashed border-red-200 bg-red-50">
-                        {/*<img className="h-10 w-auto my-3" src={"public/LogoLight.svg"}/>*/}
+                        {/*<img className="h-10 w-auto my-3" src={"/LogoLight.svg"}/>*/}
                         <h2 className="font-bold text-red-900">Error</h2>
                         <p className="text-sm" >Unable to load growing setups. Try again and reload page.</p>
 
@@ -97,7 +97,7 @@ export default function Home() {
                 (
                     <div className="flex flex-col align-middle justify-center items-center
                     p-6 m-6 w-1/2 border-2 rounded-2xl border-dashed border-amber-200 bg-amber-50">
-                        <img className="h-10 w-auto my-3" src={"public/LogoLight.svg"}/>
+                        <img className="h-10 w-auto my-3" src={"/LogoLight.svg"}/>
                         <h2 className="font-bold">No setups yet</h2>
                         <p className="text-gray-500 text-sm" >Connect your first growing setup using a serial number to begin</p>
 
