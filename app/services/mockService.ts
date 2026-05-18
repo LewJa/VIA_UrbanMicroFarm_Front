@@ -86,6 +86,18 @@ export const MockService = {
       { value: 800.0, timestamp: new Date().toISOString() }
     ];
   },
+  async getHistoricalReadings(sensorId: number, from: string, to: string): Promise<SensorHistoricalReading[]> {
+    const fromMs = Date.parse(from);
+    const toMs = Date.parse(to);
+    const intervalMs = 2 * 60 * 60 * 1000; // one reading every 2 hours
+    const readings: SensorHistoricalReading[] = [];
+    let base = 600; // mid-range ADC
+    for (let t = fromMs; t <= toMs; t += intervalMs) {
+      base = Math.min(1023, Math.max(0, base + (Math.random() - 0.48) * 60));
+      readings.push({ value: Math.round(base), timestamp: new Date(t).toISOString() });
+    }
+    return readings;
+  },
 
 
   //Users
@@ -119,12 +131,12 @@ export const MockService = {
     return { message: "Watering triggered successfully (MOCK)" };
   },
   async getLastWateringEvent(setupId: number): Promise<WateringEvent> {
-    return { eventId: 1, startTime: new Date(Date.now() - 60000).toISOString(), endTime: new Date().toISOString(), waterUsedLiters: 0.5, mode: "Manual" };
+    return { eventId: 1, startTime: new Date(Date.now() - 60000).toISOString(), endTime: new Date().toISOString(), waterUsedLiters: 0.5, mode: "manual" };
   },
   async getHistoricalWateringEvents(setupId: number): Promise<WateringEvent[]> {
     return [
-      { eventId: 2, startTime: new Date(Date.now() - 86400000).toISOString(), endTime: new Date(Date.now() - 86340000).toISOString(), waterUsedLiters: 0.5, mode: "Auto" },
-      { eventId: 1, startTime: new Date(Date.now() - 60000).toISOString(), endTime: new Date().toISOString(), waterUsedLiters: 0.5, mode: "Manual" }
+      { eventId: 2, startTime: new Date(Date.now() - 86400000).toISOString(), endTime: new Date(Date.now() - 86340000).toISOString(), waterUsedLiters: 0.5, mode: "automatic" },
+      { eventId: 1, startTime: new Date(Date.now() - 60000).toISOString(), endTime: new Date().toISOString(), waterUsedLiters: 0.5, mode: "manual" }
     ];
   }
 };

@@ -1,9 +1,10 @@
-import { useOutletContext } from "react-router";
+import { useOutletContext, useParams } from "react-router";
 import SoilMoistureHistoryChart from "./SoilMoistureHistoryChart";
 import type { PlantContext } from "../plant-layout";
 
 export default function HistoricalData() {
   const { plant, plantLoading, plantError } = useOutletContext<PlantContext>();
+  const { setupId } = useParams<{ setupId: string }>();
 
   if (plantLoading) {
     return (
@@ -23,6 +24,7 @@ export default function HistoricalData() {
     <SoilMoistureHistoryChart
       sensorId={plant.sensorId}
       plantName={plant.name}
+      setupId={setupId !== undefined ? Number(setupId) : undefined}
     />
   );
 }

@@ -24,6 +24,7 @@ export const sensorService = {
     sensorId: number,
     { from, to }: { from: string; to: string },
   ): Promise<SensorHistoricalReading[]> => {
+    if (isMockEnabled) return MockService.getHistoricalReadings(sensorId, from, to);
     const response = await api.get<SensorHistoricalReading[]>(
       `/api/sensors/${sensorId}/readings`,
       { params: { from, to } },
