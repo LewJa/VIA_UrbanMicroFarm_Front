@@ -56,7 +56,7 @@ export default function Home() {
 
     <div className="min-h-screen bg-mf-bg text-mf-ink">
         <div className="mx-6 mt-10 max-w-5xl">
-            <p className="mf-eyebrow">{formattedDate}</p>
+            <p className="mf-small-text">{formattedDate}</p>
             <h1 className="mf-h1 mt-2 text-4xl sm:text-5xl text-mf-ink">
                 {welcomeText}
                 <span className="italic text-mf-forest">{userName}</span>
@@ -64,7 +64,7 @@ export default function Home() {
         </div>
 
         <div className="mx-6 mt-10 flex items-center justify-between">
-            <p className="mf-eyebrow">Growing setups</p>
+            <p className="mf-small-text">Growing setups</p>
 
             <button
                 className="mf-btn mf-btn-primary mf-btn-sm"
