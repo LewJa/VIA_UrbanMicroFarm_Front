@@ -19,3 +19,8 @@ To build and run the Docker container, click the play button below:
 ```bash
     docker rmi urban-frontend:latest
 ```
+
+## Creating .env file
+```bash
+    cp .env.example .env
+```
