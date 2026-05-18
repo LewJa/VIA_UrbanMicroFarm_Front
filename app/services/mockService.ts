@@ -21,10 +21,21 @@ export const MockService = {
   ] as MoistureSensor[],
 
   async assignSetupToUser(userId: number, setupId: number): Promise<{ growingSetup: GrowingSetup }> {
-    return { growingSetup: this.growingSetups.find(s => s.id === setupId) || { id: setupId, location: "Default", status: "Active" } };
+    let setup = this.growingSetups.find(s => s.id === setupId);
+    if (!setup) {
+      setup = { id: setupId, location: "Default", status: "Active" };
+      this.growingSetups.push(setup);
+    }
+    return { growingSetup: setup };
   },
   async updateSetupLocation(setupId: number, location: string): Promise<{ growingSetup: GrowingSetup }> {
-    const setup = this.growingSetups.find(s => s.id === setupId) || { id: setupId, location: "Default", status: "Active" };
+    let setup = this.growingSetups.find(s => s.id === setupId);
+    if (setup) {
+      setup.location = location;
+    } else {
+      setup = { id: setupId, location, status: "Active" };
+      this.growingSetups.push(setup);
+    }
     return { growingSetup: { ...setup, location } };
   },
   async disconnectSetupFromUser(setupId: number): Promise<{ message: string }> {
