@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ─── 2. DESIGN TOKENS ──────────────────────────────────────
+/*
    token => Tailwind utility:
      --color-mf-forest          => bg-mf-forest, text-mf-forest, border-mf-forest
      --font-serif               => font-serif
