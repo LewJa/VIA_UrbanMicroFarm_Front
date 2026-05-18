@@ -17,7 +17,7 @@ export interface WateringEvent {
   startTime: string;
   endTime: string;
   waterUsedLiters: number;
-  mode: string;
+  mode: "manual" | "automatic";
 }
 
 export interface MoistureSensor {
