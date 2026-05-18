@@ -78,6 +78,7 @@ export default function Home() {
                                 key={setup.id}
                                 setupId={setup.id}
                                 locationName={setup.location}
+                                status={setup.status}
                             />
                         ))
                     }
