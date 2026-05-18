@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {growingSetupsService} from "~/services/growingSetupsService";
-import GrowingSetupCard from "../components/growingSetup/growing-setup-card";
-import {AddGrowingSetupModal} from "~/components/growingSetup/add-growingsetup";
+import GrowingSetupCard from "../components/growingSetup/GrowingSetupCard";
+import {AddGrowingSetupModal} from "~/components/growingSetup/AddGrowingSetupPopUp";
 import type {GrowingSetup, SetupReading} from "~/model/growingSetup/types";
 
 export default function Home() {
