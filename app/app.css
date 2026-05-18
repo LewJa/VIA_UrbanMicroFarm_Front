@@ -118,10 +118,10 @@
   .mf-chip-dot   { @apply w-1.5 h-1.5 rounded-full bg-current opacity-80; }
 
   /* Headings */
-  .mf-h1 { @apply font-serif font-medium tracking-[-0.02em]; }
-  .mf-h2 { @apply font-serif font-medium tracking-[-0.015em]; }
-  .mf-eyebrow {
-    @apply text-[11px] tracking-[.12em] uppercase font-medium text-mf-ink-3;
+  .mf-h1 { @apply font-serif font-medium }
+  .mf-h2 { @apply font-serif font-medium}
+  .mf-small-text {
+    @apply text-[16px] uppercase text-mf-ink-3;
   }
 
   /* Tabs */
