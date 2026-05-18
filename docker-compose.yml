@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: development-dependencies-env
+    container_name: via_urban_microfarm_frontend
+    command: npm run dev
+    ports:
+      - "5173:5173"
+    volumes:  
+      - .:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
