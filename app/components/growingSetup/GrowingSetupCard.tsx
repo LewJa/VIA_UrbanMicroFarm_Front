@@ -9,13 +9,11 @@ import {SunIcon} from "~/components/icons/icons-specific/Sun";
 
 type GrowingSetupCardProps = {
     setupId: number;
-  locationName: string;
+    locationName: string;
+    status?: string;
 };
 
-export default function GrowingSetupCard({
-                                             setupId,
-  locationName,
-}: GrowingSetupCardProps) {
+export default function GrowingSetupCard({ setupId, locationName, status }: GrowingSetupCardProps) {
 
     const [loading, setLoading] = useState(true);
     const [readingsError, setReadingsError] = useState<string | null>(null);
