@@ -10,22 +10,7 @@ export default [
 
   route(
     "setup/:setupId/sensor/:sensorId/plant/:plantId",
-    "routes/plant.tsx",
-    [
-
-      index(
-        "features/plants/components/basic-data.tsx",
-        {
-          id: "plant-basic-data-index",
-        }
-      ),
-
-      route(
-        "basic-data",
-        "features/plants/components/basic-data.tsx"
-      ),
-
-    ]
+    "routes/plant.tsx"
   ),
 
 ] satisfies RouteConfig;
