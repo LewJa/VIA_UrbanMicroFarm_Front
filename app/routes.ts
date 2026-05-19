@@ -6,7 +6,9 @@ import {
 
 export default [
   index("routes/home.tsx"),
-    route("setup/:setupId", "routes/growing-setup.tsx"),
+  route("account", "routes/account.tsx"),
+  route("alerts", "routes/alerts.tsx"),
+  route("setup/:setupId", "routes/growing-setup.tsx"),
     route("setup/:setupId/sensor/:sensorId/plant/:plantId", "routes/plant.tsx", [
       index("components/plant/plant-subpages/basic-data/basic-data.tsx", {
         id: "plant-basic-data-index",
