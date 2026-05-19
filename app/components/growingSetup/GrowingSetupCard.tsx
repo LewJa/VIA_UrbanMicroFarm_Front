@@ -6,6 +6,7 @@ import ReadingTile from "~/components/growingSetup/ReadingTile";
 import {ThermometerIcon} from "~/components/icons/icons-specific/Thermometer";
 import {DropIcon} from "~/components/icons/icons-specific/Drop";
 import {SunIcon} from "~/components/icons/icons-specific/Sun";
+import {Link} from "react-router";
 
 type GrowingSetupCardProps = {
     setupId: number;
@@ -47,7 +48,8 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
 
 
   return (
-    <div className="mf-card overflow-hidden flex flex-col group hover:shadow-mf-2 transition-shadow">
+    <Link to={`/setup/${setupId}`} state={{ location: locationName, status: status ?? "" }}
+                className="mf-card overflow-hidden flex flex-col group hover:shadow-mf-2 transition-shadow">
         <div className="mf-photo mf-photo-leaf h-32 relative">
             <span className="opacity-70">{locationName.toLowerCase()}</span>
         </div>
@@ -84,10 +86,11 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
                         unit="%"
                         tone="water"
                     />
+                    {/* TODO: confirm whether to surface as lux once IoT publishes a conversion */}
                     <ReadingTile
                         icon={<SunIcon />}
                         label="Light"
-                        value={setupReadings.light}
+                        value={setupReadings.light/1023}
                         unit="%"
                         tone="leaf"
                     />
@@ -96,6 +99,6 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
                 <div className="text-sm text-mf-ink-3 italic">No readings available yet.</div>
             )}
         </div>
-    </div>
+    </Link>
   );
 }
