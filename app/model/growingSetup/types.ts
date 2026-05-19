@@ -5,19 +5,10 @@ export interface GrowingSetup {
 }
 
 export interface SetupReading {
-  setupId: number;
   timestamp: string;
-  temperature: number;
+ temperature: number;
   humidity: number;
   light: number;
-}
-
-export interface WateringEvent {
-  eventId: number;
-  startTime: string;
-  endTime: string;
-  waterUsedLiters: number;
-  mode: string;
 }
 
 export interface MoistureSensor {
