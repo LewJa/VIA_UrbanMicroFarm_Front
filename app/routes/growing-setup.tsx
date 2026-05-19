@@ -94,7 +94,7 @@ export default function GrowingSetupPage() {
         aria-busy="true"
         aria-label="Loading growing setup"
       >
-        <p className="text-gray-500">Loading…</p>
+        <p className="text-mf-ink-3">Loading…</p>
       </div>
     );
   }
@@ -103,12 +103,12 @@ export default function GrowingSetupPage() {
     return (
       <div
         role="alert"
-        className="m-6 p-6 rounded-2xl border-2 border-dashed border-red-200 bg-red-50"
+        className="m-6 p-6 rounded-mf-lg border-2 border-dashed border-mf-err/30 bg-mf-err/8"
       >
-        <h2 className="font-bold text-red-900">Error</h2>
-        <p className="text-sm mt-1">{errorMessage}</p>
+        <h2 className="font-bold text-mf-err">Error</h2>
+        <p className="text-sm mt-1 text-mf-ink-2">{errorMessage}</p>
         <button
-          className="mt-3 rounded-2xl py-1 px-4 bg-red-900 text-gray-100 text-sm"
+          className="mf-btn mf-btn-sm mt-3 bg-mf-err text-[#F4EEDB] hover:brightness-[0.85]"
           onClick={() => setRetryCount((c) => c + 1)}
         >
           Retry
@@ -120,61 +120,53 @@ export default function GrowingSetupPage() {
   return (
     <div className="mx-4 sm:mx-6 xl:mx-12 mt-6 mb-10 space-y-6 max-w-screen-xl">
       <div>
-        <h1 className="text-3xl font-bold text-green-950">{setup?.location ?? `Setup #${id}`}</h1>
-        {setup?.status && <p className="text-sm text-gray-500 mt-1">Status: {setup.status}</p>}
+        <h1 className="text-3xl font-bold text-mf-forest">{setup?.location ?? `Setup #${id}`}</h1>
+        {setup?.status && <p className="text-sm text-mf-ink-3 mt-1">Status: {setup.status}</p>}
       </div>
 
       {/* Environmental readings */}
-      <section
-        aria-label="Environmental readings"
-        className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6"
-      >
-        <h2 className="font-semibold text-lg mb-4">Latest Readings</h2>
+      <section aria-label="Environmental readings" className="mf-card p-4 sm:p-6">
+        <h2 className="font-semibold text-lg mb-4 text-mf-ink">Latest Readings</h2>
         {reading ? (
           <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="flex flex-col">
-              <dt className="text-xs uppercase tracking-wide text-gray-400">Temperature</dt>
-              <dd className="text-2xl font-semibold text-gray-800 mt-1">{reading.temperature} °C</dd>
+              <dt className="text-xs uppercase tracking-wide text-mf-ink-4">Temperature</dt>
+              <dd className="text-2xl font-semibold text-mf-ink mt-1">{reading.temperature} °C</dd>
             </div>
             <div className="flex flex-col">
-              <dt className="text-xs uppercase tracking-wide text-gray-400">Humidity</dt>
-              <dd className="text-2xl font-semibold text-gray-800 mt-1">{reading.humidity} %</dd>
+              <dt className="text-xs uppercase tracking-wide text-mf-ink-4">Humidity</dt>
+              <dd className="text-2xl font-semibold text-mf-ink mt-1">{reading.humidity} %</dd>
             </div>
             <div className="flex flex-col">
               {/* TODO: confirm whether to surface as lux once IoT publishes a conversion */}
-              <dt className="text-xs uppercase tracking-wide text-gray-400">Light (ADC)</dt>
-              <dd className="text-2xl font-semibold text-gray-800 mt-1">{reading.light} / 1023</dd>
+              <dt className="text-xs uppercase tracking-wide text-mf-ink-4">Light (ADC)</dt>
+              <dd className="text-2xl font-semibold text-mf-ink mt-1">{reading.light} / 1023</dd>
             </div>
             <div className="flex flex-col">
-              <dt className="text-xs uppercase tracking-wide text-gray-400">Last Updated</dt>
-              <dd className="text-sm text-gray-600 mt-1">
+              <dt className="text-xs uppercase tracking-wide text-mf-ink-4">Last Updated</dt>
+              <dd className="text-sm text-mf-ink-2 mt-1">
                 {new Date(reading.timestamp).toLocaleString()}
               </dd>
             </div>
           </dl>
         ) : (
-          <p className="text-sm text-gray-400">No readings available.</p>
+          <p className="text-sm text-mf-ink-4">No readings available.</p>
         )}
       </section>
 
       {/* Sensors */}
-      <section
-        aria-label="Sensors"
-        className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6"
-      >
-        <h2 className="font-semibold text-lg mb-4">Sensors</h2>
+      <section aria-label="Sensors" className="mf-card p-4 sm:p-6">
+        <h2 className="font-semibold text-lg mb-4 text-mf-ink">Sensors</h2>
         {sensors.length === 0 ? (
-          <p className="text-sm text-gray-400">No sensors assigned.</p>
+          <p className="text-sm text-mf-ink-4">No sensors assigned.</p>
         ) : (
           <ul className="space-y-2">
             {sensors.map((sensor) => (
               <li key={sensor.id} className="flex items-center gap-3 text-sm">
-                <span className="font-mono text-gray-700">#{sensor.id}</span>
+                <span className="font-mono text-mf-ink-2">#{sensor.id}</span>
                 <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    sensor.status === "Active"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-gray-100 text-gray-500"
+                  className={`mf-chip ${
+                    sensor.status === "Active" ? "mf-chip-ok" : ""
                   }`}
                 >
                   {sensor.status}
@@ -186,21 +178,18 @@ export default function GrowingSetupPage() {
       </section>
 
       {/* Plants */}
-      <section
-        aria-label="Plants"
-        className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6"
-      >
+      <section aria-label="Plants" className="mf-card p-4 sm:p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-lg">Plants</h2>
+          <h2 className="font-semibold text-lg text-mf-ink">Plants</h2>
           <button
-            className="rounded-2xl py-1 px-4 bg-green-950 text-gray-100 text-sm hover:bg-green-800 transition-colors"
+            className="mf-btn mf-btn-primary mf-btn-sm"
             onClick={() => setIsModalOpen(true)}
           >
             Add Plant
           </button>
         </div>
         {plants.length === 0 ? (
-          <p className="text-sm text-gray-400">No plants yet. Add one to get started.</p>
+          <p className="text-sm text-mf-ink-4">No plants yet. Add one to get started.</p>
         ) : (
           <ul className="space-y-2">
             {plants.map((plant) => (
@@ -208,19 +197,17 @@ export default function GrowingSetupPage() {
                 {/* TODO: simplify to /plants/:plantId once nested URL hierarchy is revisited */}
                 <Link
                   to={`/setup/${id}/sensor/${plant.sensorId}/plant/${plant.id}`}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-gray-100 hover:border-green-200 hover:bg-green-50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-mf-md border border-mf-line hover:border-mf-forest/30 hover:bg-mf-forest/5 transition-colors"
                 >
                   <div>
-                    <p className="font-medium text-green-950">{plant.name}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="font-medium text-mf-ink">{plant.name}</p>
+                    <p className="text-xs text-mf-ink-3 mt-0.5">
                       {plant.type} · Planted {plant.datePlanted}
                     </p>
                   </div>
                   <span
-                    className={`mt-2 sm:mt-0 self-start sm:self-auto px-2 py-0.5 rounded-full text-xs font-medium ${
-                      plant.status === "Healthy"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-amber-100 text-amber-800"
+                    className={`mf-chip mt-2 sm:mt-0 self-start sm:self-auto ${
+                      plant.status === "Healthy" ? "mf-chip-ok" : "mf-chip-warn"
                     }`}
                   >
                     {plant.status}

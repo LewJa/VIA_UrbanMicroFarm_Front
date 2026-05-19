@@ -67,7 +67,7 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
                     Loading...
                 </div>
             ) : readingsError ? (
-                <div className="text-sm text-mf-ink-2 bg-[#F4DBD2]/40 border border-[#E9C3B5] rounded-mf-md px-3 py-2">
+                <div className="text-sm text-mf-err bg-mf-err/10 border border-mf-err/20 rounded-mf-md px-3 py-2">
                     Couldn't load sensor data.
                 </div>
             ) : setupReadings ? (

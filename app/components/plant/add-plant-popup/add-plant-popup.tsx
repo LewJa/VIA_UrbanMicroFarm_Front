@@ -75,10 +75,10 @@ export function AddPlantModal({
     <div className="modal-overlay">
       <div className="modal-container">
         {submitStatus === "success" && (
-            <p className="text-green-600 text-sm mt-2">Plant added successfully!</p>
+            <p className="text-mf-ok text-sm mt-2">Plant added successfully!</p>
         )}
         {submitStatus === "error" && (
-            <p className="text-red-600 text-sm mt-2">{errorMessage}</p>
+            <p className="text-mf-err text-sm mt-2">{errorMessage}</p>
         )}
         {submitStatus === null && (
             <form onSubmit={handleSubmit}>
@@ -151,11 +151,11 @@ export function AddPlantModal({
                   </label>
                   <div className="flex flex-row">
                     {sensorList.length === 0 && (
-                        <p className="text-sm text-gray-500">No moisture sensors detected.</p>
+                        <p className="text-sm text-mf-ink-3">No moisture sensors detected.</p>
                     )}
                     {sensorList.map((sensor) => (
                         <button
-                            className={`p-1 ${sensorId === sensor.id ? "bg-amber-400" : "bg-amber-100 hover:bg-amber-400"}`}
+                            className={`p-1 rounded transition-colors ${sensorId === sensor.id ? "bg-mf-warn/60" : "bg-mf-warn/15 hover:bg-mf-warn/60"}`}
                             key={sensor.id}
                             type="button"
                             onClick={() => {

@@ -3,15 +3,17 @@ import {growingSetupsService} from "~/services/growingSetupsService";
 import GrowingSetupCard from "../components/growingSetup/GrowingSetupCard";
 import {AddGrowingSetupModal} from "~/components/growingSetup/AddGrowingSetupPopUp";
 import type {GrowingSetup, SetupReading} from "~/model/growingSetup/types";
+import {useAuth} from "~/context/AuthContext";
 
 export default function Home() {
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userId, setUserId] = useState<number | null>(1);
+  const userId = user?.id ?? null;
   const [growingSetups, setGrowingSetups] = useState<GrowingSetup[]>([]);
   const [growingSetupError, setGrowingSetupError] = useState(null);
 
-  const [userName, setUserName] = useState("Anya");
-  const [welcomeText, setWelcomeText] = useState(`Good morning, `);
+  const userName = user?.name || user?.email?.split("@")[0] || "";
+  const [welcomeText] = useState(`Good morning, `);
 
 
   // format date to display it in different format
@@ -31,23 +33,12 @@ export default function Home() {
   };
 
     useEffect(() => {
-    //     auth user
-    //     setUserId
-        if(userId == null) {
-            // redirect to login page
-            return;
-        }
+        if (userId == null) return;
 
         const fetchGrowingSetups = async () => {
             const setups = await growingSetupsService.getSetupsByUserID(userId);
-            // catch error if any
             setGrowingSetups(setups);
         };
-
-        //TODO:
-        //fetch user name
-        //fetch  welcome text
-        //fetch random subtext
 
         fetchGrowingSetups();
     }, [userId]);
@@ -89,10 +80,9 @@ export default function Home() {
                 </div>
             ) : growingSetupError ? (
                 <div
-                    className="mf-card flex flex-col items-center text-center
-                       p-8 border-dashed border-[#E9C3B5] bg-[#F4DBD2]/40"
+                    className="mf-card flex flex-col items-center text-center p-8 border-dashed border-mf-err/30 bg-mf-err/8"
                 >
-                    <h2 className="mf-h2 text-xl text-[#7A2E1A]">Something went wrong</h2>
+                    <h2 className="mf-h2 text-xl text-mf-err">Something went wrong</h2>
                     <p className="mt-1 text-sm text-mf-ink-2 max-w-sm">
                         Unable to load growing setups. Try refreshing the page.
                     </p>
