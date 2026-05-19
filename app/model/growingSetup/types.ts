@@ -2,6 +2,7 @@ export interface GrowingSetup {
   id: number;
   location: string;
   status: string;
+  sensorSlots?: number;
 }
 
 export interface SetupReading {
