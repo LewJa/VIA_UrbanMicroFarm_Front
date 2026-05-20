@@ -1,11 +1,30 @@
 import type { Route } from "./+types/plant";
-import { PlantLayout } from "../components/plant/plant-subpages/plant-layout";
 
-export async function clientLoader({ params }: Route.LoaderArgs) {
-    const plantId = params.plantId;
-    return { plantId };
+import PlantCard from "../features/plants/plant-card/plant-card";
+
+export async function clientLoader({
+  params,
+}: Route.LoaderArgs) {
+
+  const plantId = params.plantId;
+
+  return { plantId };
 }
 
-export default function PlantRoute({ loaderData }: Route.ComponentProps) {
-    return <PlantLayout plantId={loaderData.plantId} />;
+export default function PlantRoute() {
+
+  return (
+
+    <PlantCard
+      name="Sweet basil"
+      type="Lamiaceae"
+      lastWatered="6h"
+      sunlight="6.4 hrs"
+      moisture={62}
+      temperature={22}
+      humidity={64}
+      light={68}
+    />
+
+  );
 }

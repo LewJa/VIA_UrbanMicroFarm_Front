@@ -66,10 +66,6 @@ export function AddPlantModal({
       await addPlant({ sensorId, name, type, description });
 
       setSubmitStatus("success");
-      setTimeout(() => {
-        onContinue({ name, type, sensorId });
-        handleClose();
-      }, 1500);
 
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to add plant.";
@@ -80,14 +76,41 @@ export function AddPlantModal({
 
   return (
     <div className={`modal-overlay${isClosing ? " is-closing" : ""}`}>
-      <div className="modal-container">
-        {submitStatus === "success" && (
-            <p className="text-mf-ok text-sm mt-2">Plant added successfully!</p>
-        )}
-        {submitStatus === "error" && (
-            <p className="text-mf-err text-sm mt-2">{errorMessage}</p>
-        )}
-        {submitStatus === null && (
+      {submitStatus === "success" && (
+        <div className="bg-[#FAF8F5] rounded-3xl p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
+            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4 text-green-800">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <h2 className="text-xl font-serif font-semibold text-gray-900 mb-2">Success!</h2>
+            <p className="text-gray-600 mb-8 text-center text-sm">Your new plant has been successfully added to this setup.</p>
+            <button
+                onClick={() => {
+                    onContinue({ name, type, sensorId: sensorId as number });
+                    handleClose();
+                }}
+                className="w-full rounded-full py-2 px-6 bg-[#2B4522] text-white font-medium hover:bg-green-900 transition-colors"
+            >
+                Continue &rarr;
+            </button>
+        </div>
+      )}
+      {submitStatus === "error" && (
+        <div className="bg-[#FAF8F5] rounded-3xl p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 text-red-800">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+            <h2 className="text-xl font-serif font-semibold text-gray-900 mb-2">Error</h2>
+            <p className="text-gray-600 mb-8 text-center text-sm">We couldn't add your plant: {errorMessage}</p>
+            <button
+                onClick={() => setSubmitStatus(null)}
+                className="w-full rounded-full py-2 px-6 bg-[#2B4522] text-white font-medium hover:bg-green-900 transition-colors"
+            >
+                Try Again &rarr;
+            </button>
+        </div>
+      )}
+      {submitStatus === null && (
+        <div className="modal-container">
             <form onSubmit={handleSubmit}>
               <div className="modal-content">
                 <div className="modal-header">
@@ -188,8 +211,8 @@ export function AddPlantModal({
                 </button>
               </div>
             </form>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

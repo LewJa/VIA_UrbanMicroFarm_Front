@@ -292,7 +292,7 @@ export default function AccountPage() {
         {/* Header row */}
         <div className="w-full flex items-center justify-between px-4 mb-6">
           <button
-            onClick={() => navigate(-1, { viewTransition: true } as any)}
+            onClick={() => navigate(-1)}
             className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/6 transition-colors"
             aria-label="Go back"
           >
