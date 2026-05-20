@@ -7,26 +7,30 @@ vi.mock("../SoilMoistureHistoryChart", () => ({
   default: ({
     sensorId,
     plantName,
+    setupId,
   }: {
     sensorId: number;
     plantName?: string;
+    setupId?: number;
   }) => (
     <div
       data-testid="chart"
       data-sensor-id={String(sensorId)}
       data-plant-name={plantName ?? ""}
+      data-setup-id={setupId !== undefined ? String(setupId) : ""}
     />
   ),
 }));
 
-// Mock useOutletContext so we control what the parent layout provides
+// Mock useOutletContext and useParams so we control what the parent provides
 vi.mock("react-router", async () => {
   const actual = await vi.importActual<typeof import("react-router")>("react-router");
-  return { ...actual, useOutletContext: vi.fn() };
+  return { ...actual, useOutletContext: vi.fn(), useParams: vi.fn() };
 });
 
-import { useOutletContext } from "react-router";
+import { useOutletContext, useParams } from "react-router";
 const mockUseOutletContext = vi.mocked(useOutletContext);
+const mockUseParams = vi.mocked(useParams);
 
 const basePlant = {
   id: 7,
@@ -41,6 +45,7 @@ const basePlant = {
 describe("HistoricalData", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseParams.mockReturnValue({});
   });
 
   it("shows loading skeleton while plant is loading", () => {
@@ -114,5 +119,21 @@ describe("HistoricalData", () => {
     });
     const { container } = render(<HistoricalData />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  // C-12
+  it("passes setupId from URL params to the chart as a number", () => {
+    mockUseParams.mockReturnValue({ setupId: "5", sensorId: "101", plantId: "1" });
+    mockUseOutletContext.mockReturnValue({ plant: basePlant, plantLoading: false, plantError: null });
+    render(<HistoricalData />);
+    expect(screen.getByTestId("chart")).toHaveAttribute("data-setup-id", "5");
+  });
+
+  // C-12b
+  it("passes undefined setupId to chart when setupId param is absent from URL", () => {
+    mockUseParams.mockReturnValue({ sensorId: "101", plantId: "1" });
+    mockUseOutletContext.mockReturnValue({ plant: basePlant, plantLoading: false, plantError: null });
+    render(<HistoricalData />);
+    expect(screen.getByTestId("chart")).toHaveAttribute("data-setup-id", "");
   });
 });

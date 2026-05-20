@@ -52,15 +52,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { Navbar } from "./components/navbar/Navbar";
+
 export default function App() {
   return (
-    <>
-      <div className="navbar">
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="setup/1/sensor/1/plant/1">Plant 1</NavLink>
+    <div className="min-h-screen flex flex-col md:block">
+      <Navbar />
+      <div className="flex-1 overflow-auto md:mt-0 pb-20 md:pb-0">
+        <Outlet />
       </div>
-      <Outlet />
-    </>
+    </div>
   );
 }
 
@@ -76,7 +77,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         ? "The requested page could not be found."
         : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
+    details = error.message;  
     stack = error.stack;
   }
 

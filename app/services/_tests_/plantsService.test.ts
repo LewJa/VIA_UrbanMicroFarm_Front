@@ -1,17 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import api from "../../api/client";
-import {
- 
-  
-  getPlantsBySetup,
- 
-} from "../plantsService";
-import type {
-  SetupLatestReading,
-  SensorLatestReading,
-  Plant,
-  SensorReadingHistory,
-} from "../../model/plant/types";
+import { getPlantsBySetup } from "../plantsService";
+import type { Plant } from "../../model/plant/types";
 
 vi.mock("../../api/client", () => ({
   default: { get: vi.fn() },
@@ -19,22 +9,10 @@ vi.mock("../../api/client", () => ({
 
 const mockGet = vi.mocked(api.get);
 
-const setupReading: SetupLatestReading = {
-  timestamp: "2024-01-15T10:30:00Z",
-  temperature: 22,
-  humidity: 65,
-  light: 800,
-};
-
-const sensorReading: SensorLatestReading = {
-  sensorId: 7,
-  value: 23.5,
-  timestamp: "2024-01-15T10:30:00Z",
-};
-
 const plants: Plant[] = [
   {
     id: 1,
+    sensorId: 101,
     name: "Basil",
     description: "Mediterranean herb",
     type: "herb",
@@ -42,13 +20,6 @@ const plants: Plant[] = [
     status: "growing",
   },
 ];
-
-const readingHistory: SensorReadingHistory = {
-  reading: [
-    { value: 22.5, timestamp: "2024-01-15T09:00:00Z" },
-    { value: 23.0, timestamp: "2024-01-15T10:00:00Z" },
-  ],
-};
 
 const makeAxiosError = (status: number) =>
   Object.assign(new Error(`HTTP ${status}`), { response: { status } });
@@ -58,17 +29,11 @@ describe("plantsService", () => {
     vi.clearAllMocks();
   });
 
-  
-
-  
-
-  // ── getPlantsBySetup ──────────────────────────────────────────────────────
-
   describe("getPlantsBySetup", () => {
     it("hits the correct endpoint", async () => {
       mockGet.mockResolvedValueOnce({ data: plants });
       await getPlantsBySetup(3);
-      expect(mockGet).toHaveBeenCalledWith("/growingsetups/3/plants");
+      expect(mockGet).toHaveBeenCalledWith("/api/growingsetups/3/plants");
     });
 
     it("returns the response data", async () => {
@@ -100,6 +65,4 @@ describe("plantsService", () => {
       });
     });
   });
-
-  
 });

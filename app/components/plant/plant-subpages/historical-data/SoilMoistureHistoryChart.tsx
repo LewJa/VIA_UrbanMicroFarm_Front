@@ -9,19 +9,33 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { sensorService } from "~/services/sensorService";
+import { wateringService } from "~/services/wateringService";
 import type { SensorHistoricalReading } from "~/model/sensor/types";
+import type { WateringEvent } from "~/model/growingSetup/types";
+
+const MODE_LABELS: Record<WateringEvent["mode"], string> = {
+  manual: "Manual",
+  automatic: "Automatic",
+};
+
+const WATERING_COLOR: Record<WateringEvent["mode"], string> = {
+  manual: "#f97316",
+  automatic: "#3b82f6",
+};
 
 type Range = "24h" | "7d" | "30d";
 
 interface Props {
   sensorId: number;
   plantName?: string;
+  setupId?: number;
 }
 
 interface ChartPoint {
   time: number;
   moisture: number;
   timestamp: string;
+  _wateringEvent?: WateringEvent;
 }
 
 const adcToPercent = (value: number): number =>
@@ -51,31 +65,60 @@ const RANGES: { label: string; value: Range }[] = [
   { label: "30 days", value: "30d" },
 ];
 
-export default function SoilMoistureHistoryChart({ sensorId, plantName }: Props) {
+export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId }: Props) {
   const [range, setRange] = useState<Range>("7d");
-  const [status, setStatus] = useState<"loading" | "error" | "empty" | "success">(
-    "loading",
-  );
+  const [status, setStatus] = useState<"loading" | "error" | "empty" | "success">("loading");
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [wateringError, setWateringError] = useState(false);
+
+  useEffect(() => {
+    if (setupId === undefined) {
+      console.warn(
+        "SoilMoistureHistoryChart: setupId not provided, watering overlay disabled",
+      );
+    }
+  }, [setupId]);
 
   const fetchData = useCallback(async () => {
     setStatus("loading");
     setErrorMessage("");
+    setWateringError(false);
     const { from, to } = getRangeTimestamps(range);
+
     try {
       const readings = await sensorService.getHistoricalReadings(sensorId, { from, to });
       if (readings.length <= 1) {
         setStatus("empty");
         return;
       }
-      setChartData(
-        readings.map((r: SensorHistoricalReading) => ({
-          time: new Date(r.timestamp).getTime(),
-          moisture: adcToPercent(r.value),
-          timestamp: r.timestamp,
-        })),
-      );
+
+      const moisturePoints: ChartPoint[] = readings.map((r: SensorHistoricalReading) => ({
+        time: new Date(r.timestamp).getTime(),
+        moisture: adcToPercent(r.value),
+        timestamp: r.timestamp,
+      }));
+
+      if (setupId !== undefined) {
+        try {
+          const events = await wateringService.getHistoricalWateringEvents(setupId, from, to);
+          for (const event of events) {
+            const eventMid = (Date.parse(event.startTime) + Date.parse(event.endTime)) / 2;
+            let nearest = moisturePoints[0];
+            let minDiff = Infinity;
+            for (const pt of moisturePoints) {
+              const diff = Math.abs(pt.time - eventMid);
+              if (diff < minDiff) { minDiff = diff; nearest = pt; }
+            }
+            if (nearest) nearest._wateringEvent = event;
+          }
+        } catch (err) {
+          console.error("SoilMoistureHistoryChart: watering events fetch failed", err);
+          setWateringError(true);
+        }
+      }
+
+      setChartData(moisturePoints);
       setStatus("success");
     } catch (err: unknown) {
       const axiosErr = err as {
@@ -86,7 +129,7 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName }: Props)
       );
       setStatus("error");
     }
-  }, [sensorId, range]);
+  }, [sensorId, setupId, range]);
 
   useEffect(() => {
     fetchData();
@@ -131,35 +174,122 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName }: Props)
       )}
 
       {status === "success" && (
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="time"
-              type="number"
-              scale="time"
-              domain={["dataMin", "dataMax"]}
-              tickFormatter={formatXTick(range)}
-            />
-            <YAxis
-              domain={[0, 100]}
-              label={{ value: "Moisture (%)", angle: -90, position: "insideLeft" }}
-            />
-            <Tooltip
-              content={({ active, payload }) => {
-                if (!active || !payload?.length) return null;
-                const { timestamp, moisture } = payload[0].payload as ChartPoint;
-                return (
-                  <div>
-                    <p>{new Date(timestamp).toLocaleString()}</p>
-                    <p>Moisture: {moisture}%</p>
-                  </div>
-                );
-              }}
-            />
-            <Line type="monotone" dataKey="moisture" stroke="#4ade80" dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+        <>
+          <div role="list" aria-label="Chart legend">
+            <div role="listitem" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginRight: 12 }}>
+              <span
+                aria-hidden="true"
+                style={{ display: "inline-block", width: 24, height: 3, borderRadius: 2, background: "#4ade80" }}
+              />
+              Soil Moisture
+            </div>
+            {setupId !== undefined && (
+              <>
+                <div role="listitem" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginRight: 12 }}>
+                  <span
+                    aria-hidden="true"
+                    data-testid="legend-manual"
+                    data-shape="circle"
+                    style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: WATERING_COLOR.manual }}
+                  />
+                  Manual Watering
+                </div>
+                <div role="listitem" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginRight: 12 }}>
+                  <span
+                    aria-hidden="true"
+                    data-testid="legend-automatic"
+                    data-shape="square"
+                    style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: WATERING_COLOR.automatic }}
+                  />
+                  Automatic Watering
+                </div>
+              </>
+            )}
+            {wateringError && (
+              <span aria-live="polite" style={{ fontSize: "0.75rem", color: "#9ca3af", marginLeft: 8 }}>
+                Watering data unavailable
+              </span>
+            )}
+          </div>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="time"
+                type="number"
+                scale="time"
+                domain={["dataMin", "dataMax"]}
+                tickFormatter={formatXTick(range)}
+              />
+              <YAxis
+                domain={[0, 100]}
+                label={{ value: "Moisture (%)", angle: -90, position: "insideLeft" }}
+              />
+
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null;
+                  const point = payload[0].payload as ChartPoint;
+                  const event = point._wateringEvent;
+                  return (
+                    <div style={{ background: "#fff", border: "1px solid #e5e7eb", padding: "8px 12px", borderRadius: 6 }}>
+                      <p>{new Date(point.timestamp).toLocaleString()}</p>
+                      <p>Moisture: {point.moisture}%</p>
+                      {event && (
+                        <p style={{ marginTop: 4, fontWeight: 600, color: WATERING_COLOR[event.mode] }}>
+                          {MODE_LABELS[event.mode]} Watering — {event.waterUsedLiters} L
+                        </p>
+                      )}
+                    </div>
+                  );
+                }}
+              />
+
+              <Line
+                type="monotone"
+                dataKey="moisture"
+                stroke="#4ade80"
+                connectNulls
+                dot={(props: any) => {
+                  const { cx, cy, payload, key } = props;
+                  if (!payload._wateringEvent) {
+                    return <circle key={key} cx={cx} cy={cy} r={0} fill="none" />;
+                  }
+                  const mode = payload._wateringEvent.mode as WateringEvent["mode"];
+                  const color = WATERING_COLOR[mode];
+                  if (mode === "automatic") {
+                    return (
+                      <rect
+                        key={key}
+                        x={cx - 5}
+                        y={cy - 5}
+                        width={10}
+                        height={10}
+                        rx={2}
+                        fill={color}
+                        stroke="white"
+                        strokeWidth={1.5}
+                      />
+                    );
+                  }
+                  return (
+                    <circle
+                      key={key}
+                      cx={cx}
+                      cy={cy}
+                      r={5}
+                      fill={color}
+                      stroke="white"
+                      strokeWidth={1.5}
+                    />
+                  );
+                }}
+                activeDot={{ r: 5 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </>
       )}
     </div>
   );

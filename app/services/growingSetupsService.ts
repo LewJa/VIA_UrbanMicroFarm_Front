@@ -38,4 +38,10 @@ export const growingSetupsService = {
     const response = await api.get<MoistureSensor[]>(`/api/growingsetups/${setupId}/sensors`);
     return response.data;
   },
+
+  // TODO: replace with GET /api/growingsetups/{setupId} once backend exposes a single-setup endpoint
+  getSetupById: async (setupId: number, userId: number): Promise<GrowingSetup | null> => {
+    const setups = await growingSetupsService.getSetupsByUserID(userId);
+    return setups.find((s) => s.id === setupId) ?? null;
+  },
 };

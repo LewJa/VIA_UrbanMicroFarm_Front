@@ -7,7 +7,7 @@ export const getPlantsBySetup = async (
 ): Promise<Plant[]> => {
   if (isMockEnabled) return MockService.getPlantsBySetup(setupId);
   const response = await api.get<Plant[]>(
-    `/growingsetups/${setupId}/plants`,
+    `/api/growingsetups/${setupId}/plants`,
   );
 
   return response.data;
