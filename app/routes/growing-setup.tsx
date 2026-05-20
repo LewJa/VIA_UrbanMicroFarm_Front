@@ -123,39 +123,30 @@ export default function GrowingSetupPage() {
         );
     }
 
-    const maxSlots = setup?.sensorSlots ?? 4;
+    const maxSlots = setup?.sensorSlots;
     const locationName = setup?.location ?? "Setup #$id";
 
     return (
-        <div className="mx-4 sm:mx-6 xl:mx-12 mt-6 mb-20 w-full max-w-[600px] lg:max-w-screen-xl lg:mx-auto">
-            <header className="flex items-center justify-between mb-6">
-                <button aria-label="Go back" onClick={() => navigate(-1)} className="p-2 -ml-2 text-[#1a2119] hover:bg-black/5 rounded-full transition-colors">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
-                <h1 className="text-[17px] text-[#1a2119] font-medium tracking-tight">Growing setup</h1>
-                <button aria-label="More options" onClick={() => alert("More options coming soon!")} className="p-2 -mr-2 text-[#1a2119] hover:bg-black/5 rounded-full transition-colors">
-                    <MoreDotsIcon />
-                </button>
-            </header>
+        <div className="px-4 sm:px-6 xl:px-12 w-full max-w-150 lg:max-w-full lg:mx-auto">
+            {/*<header className="flex items-center justify-between mb-6">*/}
+            {/*    <button aria-label="Go back" onClick={() => navigate(-1)} className="p-2 -ml-2 text-[#1a2119] hover:bg-black/5 rounded-full transition-colors">*/}
+            {/*        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>*/}
+            {/*    </button>*/}
+            {/*    <h1 className="text-[17px] text-[#1a2119] font-medium tracking-tight">Growing setup</h1>*/}
+            {/*    <button aria-label="More options" onClick={() => alert("More options coming soon!")} className="p-2 -mr-2 text-[#1a2119] hover:bg-black/5 rounded-full transition-colors">*/}
+            {/*        <MoreDotsIcon />*/}
+            {/*    </button>*/}
+            {/*</header>*/}
 
             <div className="lg:grid lg:grid-cols-2 lg:gap-10 mb-6 lg:mb-10">
-                <div className="w-full aspect-[16/10] sm:aspect-video lg:aspect-auto lg:h-full rounded-[24px] mf-photo-leaf flex items-center justify-center mb-6 lg:mb-0 min-h-[200px]">
-                    <span className="text-[#6b8a4d]/70 font-mono tracking-widest text-xs font-bold">PLANT PHOTO</span>
+                <div className="w-full aspect-16/10 sm:aspect-video lg:aspect-auto lg:h-full rounded-3xl mf-photo-leaf flex items-center justify-center mb-6 lg:mb-0 min-h-50">
+                    <span className="text-[#6b8a4d]/70 font-mono tracking-widest text-xs font-bold">{setup?.location.toUpperCase()}</span>
                 </div>
 
                 <div className="flex flex-col justify-center">
-                    <div className="text-[11px] uppercase tracking-widest text-[#a8a492] font-semibold mb-2">
-                        {maxSlots} SENSOR SLOTS
-                    </div>
                     <h2 className="font-serif text-[32px] sm:text-[40px] tracking-tight text-[#1a2119] mb-4">
                         {locationName}
                     </h2>
-
-                    <div className="hidden lg:flex gap-3 mb-8">
-                        <div className="mf-chip bg-[#2d4a2b] text-[#f4eedb] border-[#2d4a2b] px-3.5 py-1.5 h-auto text-[13px]">
-                            Location: "{locationName}"
-                        </div>
-                    </div>
 
                     <div className="rounded-[20px] bg-white border border-[#e6dfce] p-5 shadow-sm">
                         <div className="text-[10px] uppercase font-bold tracking-widest text-[#a8a492] mb-3">Live Readings</div>
@@ -196,8 +187,8 @@ export default function GrowingSetupPage() {
                 </div>
             </div>
 
-            <div className="flex mb-8 w-full max-w-md">
-                <div className="mf-tabs w-full flex h-[44px]">
+            <div className="flex w-full div lg:grid lg:grid-cols-2 lg:gap-10 mb-6 lg:mb-10">
+                <div className="mf-tabs w-full flex h-11">
                     {["Plants", "Details", "Sensors"].map(tab => (
                         <button 
                             key={tab}
@@ -219,10 +210,6 @@ export default function GrowingSetupPage() {
                                 <div className="text-[11px] sm:text-[12px] uppercase tracking-widest text-[#a8a492] font-semibold">
                                     {plants.length} OF {maxSlots} SLOTS OCCUPIED
                                 </div>
-                                <button className="hidden lg:flex mf-btn mf-btn-secondary mf-btn-sm rounded-full text-[13px] bg-transparent hover:bg-white border-[#e6dfce] h-9" onClick={() => setIsModalOpen(true)}>
-                                    <svg stroke="currentColor" fill="none" strokeWidth="2.5" viewBox="0 0 24 24" width="15" height="15" className="mr-1.5"><path d="M12 5v14M5 12h14"/></svg>
-                                    Add plant
-                                </button>
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 mb-10">
@@ -264,7 +251,7 @@ export default function GrowingSetupPage() {
                                     );
                                 })}
 
-                                {plants.length < maxSlots && (
+                                {plants.length && (
                                     <div className="rounded-[16px] border-[1.5px] border-dashed border-[#d9cfb8] bg-[#FAF6EE] hover:bg-white p-3 sm:p-4 flex items-center justify-between hover:border-[#b89968] transition-colors cursor-pointer group" onClick={() => setIsModalOpen(true)}>
                                         <div className="flex items-center gap-4">
                                             <div className="w-[60px] h-[60px] sm:w-[68px] sm:h-[68px] rounded-xl border border-dashed border-[#d9cfb8] bg-white flex items-center justify-center text-[#d9cfb8] group-hover:border-[#b89968] group-hover:text-[#b89968] transition-colors">
@@ -296,28 +283,6 @@ export default function GrowingSetupPage() {
                 </div>
 
                 <div className="hidden lg:block w-[320px] shrink-0 space-y-5">
-                    <div className="mf-card p-6 border-[#e6dfce] bg-transparent shadow-none">
-                        <div className="text-[10px] uppercase font-bold tracking-widest text-[#a8a492] mb-5">At a glance</div>
-                        <div className="grid grid-cols-2 gap-y-7 gap-x-4">
-                            <div>
-                                <div className="text-[11px] uppercase tracking-[0.08em] text-[#a8a492] font-medium mb-1">Plants</div>
-                                <div className="font-serif font-bold text-[28px] text-[#1a2119]">{plants.length}</div>
-                            </div>
-                            <div>
-                                <div className="text-[11px] uppercase tracking-[0.08em] text-[#a8a492] font-medium mb-1">Open slots</div>
-                                <div className="font-serif font-bold text-[28px] text-[#1a2119]">{Math.max(0, maxSlots - plants.length)}</div>
-                            </div>
-                            <div>
-                                <div className="text-[11px] uppercase tracking-[0.08em] text-[#a8a492] font-medium mb-1">Watered today</div>
-                                <div className="font-serif font-bold text-[28px] text-[#1a2119]">2</div>
-                            </div>
-                            <div>
-                                <div className="text-[11px] uppercase tracking-[0.08em] text-[#a8a492] font-medium mb-1">Alerts</div>
-                                <div className="font-serif font-bold text-[28px] text-[#1a2119]">1</div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div className="mf-card p-6 border-[#e6dfce] bg-transparent shadow-none">
                         <div className="text-[10px] uppercase font-bold tracking-widest text-[#a8a492] mb-4">Quick actions</div>
                         <div className="space-y-2.5">
