@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route } from "react-router";
 import LoginPage from "../login";
@@ -120,15 +120,20 @@ describe("LoginPage", () => {
   });
 
   it("navigates to home on successful login", async () => {
+    vi.useFakeTimers();
     mockServiceLogin.mockResolvedValueOnce({
       token: "tok-123",
       user: { id: 1, email: "a@b.com", theme: "light" },
     });
     renderPage();
-    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@b.com" } });
-    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "mypassword" } });
-    fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
-    expect(await screen.findByTestId("home-page")).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@b.com" } });
+      fireEvent.change(screen.getByLabelText("Password"), { target: { value: "mypassword" } });
+      fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
+      await vi.runAllTimersAsync();
+    });
+    vi.useRealTimers();
+    expect(screen.getByTestId("home-page")).toBeInTheDocument();
   });
 
   // ── API error handling ─────────────────────────────────────────────────────

@@ -11,6 +11,7 @@ vi.mock("../../api/client", () => ({
     put: vi.fn(),
   },
 }));
+vi.mock("~/mocks/index", () => ({ isMockEnabled: false }));
 
 const mockPost = vi.mocked(api.post);
 const mockDelete = vi.mocked(api.delete);
