@@ -9,18 +9,19 @@ import type {
   ChangeEmailRequest,
   SetThemeRequest,
 } from "../model/user/types";
-import { MockService, isMockEnabled } from "./mockService";
+import { isMockEnabled } from "~/mocks";
+import { mockUsers } from "~/mocks/users";
 
 export const userService = {
   register: async (data: RegisterRequest): Promise<{ message: string }> => {
-    if (isMockEnabled) return MockService.register();
+    if (isMockEnabled) return mockUsers.register();
     const response = await api.post<{ message: string }>("/api/users", data);
     return response.data;
   },
 
   login: async (data: LoginRequest): Promise<LoginResponse> => {
     if (isMockEnabled) {
-      const resp = await MockService.login();
+      const resp = await mockUsers.login();
       localStorage.setItem("token", resp.token);
       return resp;
     }
@@ -30,31 +31,31 @@ export const userService = {
   },
 
   deleteAccount: async (userId: number): Promise<{ message: string }> => {
-    if (isMockEnabled) return MockService.deleteAccount();
+    if (isMockEnabled) return mockUsers.deleteAccount();
     const response = await api.delete<{ message: string }>(`/api/users/${userId}`);
     return response.data;
   },
 
   updateName: async (userId: number, name: string): Promise<{ user: UserWithName }> => {
-    if (isMockEnabled) return MockService.updateName(userId, name);
+    if (isMockEnabled) return mockUsers.updateName(userId, name);
     const response = await api.patch<{ user: UserWithName }>(`/api/users/${userId}`, { name });
     return response.data;
   },
 
   changePassword: async (userId: number, data: ChangePasswordRequest): Promise<{ message: string }> => {
-    if (isMockEnabled) return MockService.changePassword();
+    if (isMockEnabled) return mockUsers.changePassword();
     const response = await api.put<{ message: string }>(`/api/users/${userId}/password`, data);
     return response.data;
   },
 
   changeEmail: async (userId: number, data: ChangeEmailRequest): Promise<{ user: Pick<UserProfile, "id" | "email"> }> => {
-    if (isMockEnabled) return MockService.changeEmail(userId, data.newEmail);
+    if (isMockEnabled) return mockUsers.changeEmail(userId, data.newEmail);
     const response = await api.put<{ user: Pick<UserProfile, "id" | "email"> }>(`/api/users/${userId}/email`, data);
     return response.data;
   },
 
   setTheme: async (userId: number, data: SetThemeRequest): Promise<{ user: UserProfile }> => {
-    if (isMockEnabled) return MockService.setTheme(userId, data.theme);
+    if (isMockEnabled) return mockUsers.setTheme(userId, data.theme);
     const response = await api.patch<{ user: UserProfile }>(`/api/users/${userId}/theme`, data);
     return response.data;
   },

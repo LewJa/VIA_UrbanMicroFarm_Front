@@ -49,21 +49,21 @@ export function Navbar() {
           </div>
 
           <nav className="hidden md:flex items-center gap-2">
-            <NavLink 
-              to="/" 
-              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-[#304a2a] font-bold" : "text-[#7a7767] hover:text-[#304a2a] font-medium"}`}
+            <NavLink
+              to="/"
+              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
               Home
             </NavLink>
-            <NavLink 
-              to="/alerts" 
-              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-[#304a2a] font-bold" : "text-[#7a7767] hover:text-[#304a2a] font-medium"}`}
+            <NavLink
+              to="/alerts"
+              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
               Alerts
             </NavLink>
-            <NavLink 
-              to="/account" 
-              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-[#304a2a] font-bold" : "text-[#7a7767] hover:text-[#304a2a] font-medium"}`}
+            <NavLink
+              to="/account"
+              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
               Account
             </NavLink>
@@ -87,26 +87,26 @@ export function Navbar() {
       </header>
 
       {/* Mobile Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#FAF6EE] border-t border-mf-line flex justify-around items-center pt-3 pb-7">
-        <NavLink 
-          to="/" 
-          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-[#304a2a] font-bold" : "text-[#7a7767] font-medium"}`}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-mf-bg border-t border-mf-line flex justify-around items-center pt-3 pb-7">
+        <NavLink
+          to="/"
+          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >
           <HomeIcon />
           <span className="text-[11px] tracking-wide">Home</span>
         </NavLink>
-        <NavLink 
-          to="/alerts" 
-          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-[#304a2a] font-bold" : "text-[#7a7767] font-medium"}`}
+        <NavLink
+          to="/alerts"
+          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >
           <div className="relative">
             <BellIcon />
           </div>
           <span className="text-[11px] tracking-wide">Alerts</span>
         </NavLink>
-        <NavLink 
-          to="/account" 
-          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-[#304a2a] font-bold" : "text-[#7a7767] font-medium"}`}
+        <NavLink
+          to="/account"
+          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >
           <UserIcon />
           <span className="text-[11px] tracking-wide">Account</span>

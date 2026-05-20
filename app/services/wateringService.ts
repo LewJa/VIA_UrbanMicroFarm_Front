@@ -1,7 +1,7 @@
 import api from "../api/client";
 import type { WateringEvent } from "../model/growingSetup/types";
-import { MockService, isMockEnabled } from "./mockService";
-import { MOCK_WATERING_EVENTS } from "~/mocks/wateringEvents";
+import { isMockEnabled } from "~/mocks";
+import { MOCK_WATERING_EVENTS, mockWatering } from "~/mocks/wateringEvents";
 
 // Pending IoT: real endpoint not yet available. Keep false until backend ships.
 const isWateringEventsEnabled = () =>
@@ -9,13 +9,13 @@ const isWateringEventsEnabled = () =>
 
 export const wateringService = {
   triggerManualWatering: async (plantId: number): Promise<{ message: string }> => {
-    if (isMockEnabled) return MockService.triggerManualWatering(plantId);
+    if (isMockEnabled) return mockWatering.triggerManualWatering(plantId);
     const response = await api.post<{ message: string }>(`/api/plants/${plantId}/watering/manual`);
     return response.data;
   },
 
   getLastWateringEvent: async (setupId: number): Promise<WateringEvent> => {
-    if (isMockEnabled) return MockService.getLastWateringEvent(setupId);
+    if (isMockEnabled) return mockWatering.getLastWateringEvent(setupId);
     const response = await api.get<WateringEvent>(`/api/growingsetups/${setupId}/wateringEvents/latest`);
     return response.data;
   },
@@ -29,7 +29,7 @@ export const wateringService = {
         return mid >= fromMs && mid <= toMs;
       });
     }
-    if (isMockEnabled) return MockService.getHistoricalWateringEvents(setupId);
+    if (isMockEnabled) return mockWatering.getHistoricalWateringEvents(setupId);
     const response = await api.get<WateringEvent[]>(
       `/api/growingsetups/${setupId}/wateringEvents`,
       { params: { from, to } },

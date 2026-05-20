@@ -3,6 +3,94 @@ import { Link, useNavigate } from "react-router";
 import { userService } from "~/services/userService";
 import { useAuth } from "~/context/AuthContext";
 
+function LoginSuccessOverlay() {
+  return (
+    <>
+      <style>{`
+        @keyframes mf-draw-stem {
+          from { stroke-dashoffset: 30; opacity: 0; }
+          15%  { opacity: 1; }
+          to   { stroke-dashoffset: 0; opacity: 1; }
+        }
+        @keyframes mf-draw-path {
+          from { stroke-dashoffset: 60; opacity: 0; }
+          15%  { opacity: 1; }
+          to   { stroke-dashoffset: 0; opacity: 1; }
+        }
+        @keyframes mf-circle {
+          0%   { transform: scale(1); }
+          68%  { transform: scale(1.08); }
+          80%  { transform: scale(42); }
+          100% { transform: scale(42); opacity: 0; }
+        }
+        @keyframes mf-wordmark {
+          0%   { opacity: 0; transform: translateY(8px); }
+          20%  { opacity: 1; transform: translateY(0); }
+          65%  { opacity: 1; }
+          82%  { opacity: 0; }
+          100% { opacity: 0; }
+        }
+      `}</style>
+      <div
+        style={{
+          position: "fixed", inset: 0, zIndex: 100,
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          background: "var(--color-mf-bg)",
+        }}
+      >
+        <div
+          style={{
+            width: 88, height: 88, borderRadius: "50%",
+            background: "linear-gradient(135deg, #3F6638 0%, #6B8A4D 100%)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            animation: "mf-circle 1.7s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+          }}
+        >
+          <svg width="44" height="44" viewBox="0 0 26 26" fill="none">
+            <path
+              d="M13,19L13,13.75"
+              stroke="#F4EEDB" strokeWidth="1.5" strokeLinecap="round"
+              strokeDasharray="30"
+              style={{ animation: "mf-draw-stem 0.38s ease 0.05s both" }}
+            />
+            <path
+              d="M7.75,19L18.25,19"
+              stroke="#F4EEDB" strokeWidth="1.5" strokeLinecap="round"
+              strokeDasharray="60"
+              style={{ animation: "mf-draw-path 0.38s ease 0.18s both" }}
+            />
+            <path
+              d="M13,13.75C10.75,13.75 8.5,12.25 8.5,9.25C11.5,9.25 13,10.75 13,13.75Z"
+              stroke="#F4EEDB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+              strokeDasharray="60"
+              style={{ animation: "mf-draw-path 0.48s ease 0.34s both" }}
+            />
+            <path
+              d="M13,13.75C15.25,13.75 17.5,12.25 17.5,9.25C14.5,9.25 13,10.75 13,13.75Z"
+              stroke="#F4EEDB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+              strokeDasharray="60"
+              style={{ animation: "mf-draw-path 0.48s ease 0.52s both" }}
+            />
+          </svg>
+        </div>
+        <p
+          style={{
+            marginTop: 14,
+            fontFamily: "var(--font-serif)",
+            fontSize: 20, fontWeight: 500,
+            letterSpacing: "-0.3px",
+            color: "var(--color-mf-ink)",
+            animation: "mf-wordmark 1.7s ease forwards",
+          }}
+        >
+          microfarm
+        </p>
+      </div>
+    </>
+  );
+}
+
 function validate(email: string, password: string) {
   const errors: { email?: string; password?: string } = {};
   if (!email.trim()) {
@@ -25,6 +113,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +128,8 @@ export default function LoginPage() {
     try {
       const resp = await userService.login({ email, password });
       login(resp.token, resp.user);
-      navigate("/", { replace: true });
+      setShowSuccess(true);
+      setTimeout(() => navigate("/", { replace: true }), 1750);
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       setServerError(
@@ -49,6 +139,8 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  if (showSuccess) return <LoginSuccessOverlay />;
 
   return (
     <div className="min-h-screen bg-mf-bg flex flex-col items-center justify-center p-5">

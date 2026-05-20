@@ -1,40 +1,41 @@
 import api from "../api/client";
 import type { GrowingSetup, SetupReading, MoistureSensor } from "../model/growingSetup/types";
-import { MockService, isMockEnabled } from "./mockService";
+import { isMockEnabled } from "~/mocks";
+import { mockGrowingSetups } from "~/mocks/growingSetups";
 
 export const growingSetupsService = {
   assignSetupToUser: async (userId: number, setupId: number): Promise<{ growingSetup: GrowingSetup }> => {
-    if (isMockEnabled) return MockService.assignSetupToUser(userId, setupId);
+    if (isMockEnabled) return mockGrowingSetups.assignSetupToUser(userId, setupId);
     const response = await api.post<{ growingSetup: GrowingSetup }>("/api/growingsetups", { userId, setupId });
     return response.data;
   },
 
   updateSetupLocation: async (setupId: number, location: string): Promise<{ growingSetup: GrowingSetup }> => {
-    if (isMockEnabled) return MockService.updateSetupLocation(setupId, location);
+    if (isMockEnabled) return mockGrowingSetups.updateSetupLocation(setupId, location);
     const response = await api.patch<{ growingSetup: GrowingSetup }>(`/api/growingsetups/${setupId}`, { location });
     return response.data;
   },
 
   disconnectSetupFromUser: async (setupId: number): Promise<{ message: string }> => {
-    if (isMockEnabled) return MockService.disconnectSetupFromUser(setupId);
+    if (isMockEnabled) return mockGrowingSetups.disconnectSetupFromUser(setupId);
     const response = await api.delete<{ message: string }>(`/api/growingsetups/${setupId}`);
     return response.data;
   },
 
   getSetupsByUserID: async (userId: number): Promise<GrowingSetup[]> => {
-    if (isMockEnabled) return MockService.getSetupsByUserID(userId);
+    if (isMockEnabled) return mockGrowingSetups.getSetupsByUserID(userId);
     const response = await api.get<GrowingSetup[]>("/api/growingsetups", { params: { userId } });
     return response.data;
   },
 
   getSetupSensorReadings: async (setupId: number): Promise<SetupReading> => {
-    if (isMockEnabled) return MockService.getSetupSensorReadings(setupId);
+    if (isMockEnabled) return mockGrowingSetups.getSetupSensorReadings(setupId);
     const response = await api.get<SetupReading>(`/api/growingsetups/${setupId}/readings/latest`);
     return response.data;
   },
 
   fetchAllAssignedSensors: async (setupId: number): Promise<MoistureSensor[]> => {
-    if (isMockEnabled) return MockService.fetchAllAssignedSensors(setupId);
+    if (isMockEnabled) return mockGrowingSetups.fetchAllAssignedSensors(setupId);
     const response = await api.get<MoistureSensor[]>(`/api/growingsetups/${setupId}/sensors`);
     return response.data;
   },

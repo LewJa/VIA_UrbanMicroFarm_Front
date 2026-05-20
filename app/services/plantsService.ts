@@ -1,11 +1,12 @@
-import { MockService, isMockEnabled } from "./mockService";
 import api from "../api/client";
 import type { Plant } from "../model/plant/types";
+import { isMockEnabled } from "~/mocks";
+import { mockPlants } from "~/mocks/plants";
 
 export const getPlantsBySetup = async (
   setupId: number,
 ): Promise<Plant[]> => {
-  if (isMockEnabled) return MockService.getPlantsBySetup(setupId);
+  if (isMockEnabled) return mockPlants.getPlantsBySetup(setupId);
   const response = await api.get<Plant[]>(
     `/api/growingsetups/${setupId}/plants`,
   );
@@ -16,7 +17,7 @@ export const getPlantsBySetup = async (
 export const getPlant = async (
   plantId: number,
 ): Promise<Plant> => {
-  if (isMockEnabled) return MockService.getPlant(plantId);
+  if (isMockEnabled) return mockPlants.getPlant(plantId);
   const response = await api.get<Plant>(
     `/plants/${plantId}`,
   );
@@ -27,7 +28,7 @@ export const getPlant = async (
 export const getPlantBySensor = async (
   sensorId: number,
 ): Promise<Plant> => {
-  if (isMockEnabled) return MockService.getPlantForSensor(sensorId);
+  if (isMockEnabled) return mockPlants.getPlantForSensor(sensorId);
   const response = await api.get<Plant>(
     `/sensors/${sensorId}/plant`,
   );
@@ -43,7 +44,7 @@ export const addPlant = async (
     description: string;
   },
 ): Promise<Plant> => {
-  if (isMockEnabled) return MockService.addPlant(plantData);
+  if (isMockEnabled) return mockPlants.addPlant(plantData);
   const response = await api.post<Plant>(
     "/plants",
     plantData,
@@ -59,7 +60,7 @@ export const updatePlant = async (
     description?: string;
   },
 ): Promise<Plant> => {
-  if (isMockEnabled) return MockService.updatePlant(plantId, updatedData);
+  if (isMockEnabled) return mockPlants.updatePlant(plantId, updatedData);
   const response = await api.patch<Plant>(
     `/plants/${plantId}`,
     updatedData,
@@ -71,7 +72,7 @@ export const updatePlant = async (
 export const removePlant = async (
   plantId: number,
 ): Promise<{ message: string }> => {
-  if (isMockEnabled) return MockService.removePlant(plantId);
+  if (isMockEnabled) return mockPlants.removePlant(plantId);
   const response = await api.delete<{ message: string }>(
     `/plants/${plantId}`,
   );
