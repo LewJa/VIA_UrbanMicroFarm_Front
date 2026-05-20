@@ -1,3 +1,20 @@
+@keyframes mf-modal-overlay-in {
+  from { background-color: rgba(0,0,0,0); }
+  to   { background-color: rgba(0,0,0,0.5); }
+}
+@keyframes mf-modal-overlay-out {
+  from { background-color: rgba(0,0,0,0.5); }
+  to   { background-color: rgba(0,0,0,0); }
+}
+@keyframes mf-modal-in {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes mf-modal-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.94) translateY(8px); }
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -9,6 +26,11 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: mf-modal-overlay-in 200ms ease forwards;
+}
+
+.modal-overlay.is-closing {
+  animation: mf-modal-overlay-out 180ms ease forwards;
 }
 
 .modal-container {
@@ -19,6 +41,11 @@
   width: 90%;
   max-width: 400px;
   overflow: hidden;
+  animation: mf-modal-in 260ms cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+.modal-overlay.is-closing .modal-container {
+  animation: mf-modal-out 180ms ease forwards;
 }
 
 .modal-content {

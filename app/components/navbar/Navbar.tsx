@@ -50,18 +50,21 @@ export function Navbar() {
 
           <nav className="hidden md:flex items-center gap-2">
             <NavLink
+              viewTransition
               to="/"
               className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
               Home
             </NavLink>
             <NavLink
+              viewTransition
               to="/alerts"
               className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
               Alerts
             </NavLink>
             <NavLink
+              viewTransition
               to="/account"
               className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
@@ -72,12 +75,14 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <NavLink
-            to="/alerts" 
+            viewTransition
+            to="/alerts"
             className="w-10 h-10 rounded-full bg-mf-card border border-mf-line flex items-center justify-center text-mf-ink-2 hover:text-mf-ink transition-colors shadow-sm"
           >
             <BellIcon className="scale-90" />
           </NavLink>
-          <NavLink 
+          <NavLink
+            viewTransition
             to="/account"
             className="hidden md:flex w-9 h-9 rounded-full bg-mf-clay text-mf-cream items-center justify-center text-sm font-medium shadow-sm hover:opacity-90 transition-opacity"
           >
@@ -89,6 +94,7 @@ export function Navbar() {
       {/* Mobile Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-mf-bg border-t border-mf-line flex justify-around items-center pt-3 pb-7">
         <NavLink
+          viewTransition
           to="/"
           className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >
@@ -96,6 +102,7 @@ export function Navbar() {
           <span className="text-[11px] tracking-wide">Home</span>
         </NavLink>
         <NavLink
+          viewTransition
           to="/alerts"
           className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >
@@ -105,6 +112,7 @@ export function Navbar() {
           <span className="text-[11px] tracking-wide">Alerts</span>
         </NavLink>
         <NavLink
+          viewTransition
           to="/account"
           className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >

@@ -27,6 +27,7 @@ export function AddPlantModal({
 
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     const fetchSensors = async () => {
@@ -39,16 +40,22 @@ export function AddPlantModal({
     fetchSensors();
   }, [setupId]);
 
+  useEffect(() => {
+    if (isOpen) setIsClosing(false);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleClose = () => {
-    // reset all variables
-    setName("");
-    setType("");
-    setSensorId(null);
-    setSubmitStatus(null);
-    setErrorMessage("");
-    onClose();
+    setIsClosing(true);
+    setTimeout(() => {
+      setName("");
+      setType("");
+      setSensorId(null);
+      setSubmitStatus(null);
+      setErrorMessage("");
+      onClose();
+    }, 180);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,7 +79,7 @@ export function AddPlantModal({
   };
 
   return (
-    <div className="modal-overlay">
+    <div className={`modal-overlay${isClosing ? " is-closing" : ""}`}>
       <div className="modal-container">
         {submitStatus === "success" && (
             <p className="text-mf-ok text-sm mt-2">Plant added successfully!</p>
@@ -87,7 +94,7 @@ export function AddPlantModal({
                   <h2 className="modal-title">Add plant</h2>
                   <button
                       type="button"
-                      onClick={onClose}
+                      onClick={handleClose}
                       className="modal-close-btn"
                   >
                     ✕

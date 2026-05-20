@@ -51,6 +51,22 @@
   --shadow-mf-3: 0 24px 60px -20px rgba(31,30,26,.28), 0 8px 20px -10px rgba(31,30,26,.12);
 }
 
+/* Page transition animations — triggered by React Router viewTransition */
+@keyframes mf-page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes mf-page-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-6px); }
+}
+::view-transition-old(root) {
+  animation: mf-page-out 180ms ease forwards;
+}
+::view-transition-new(root) {
+  animation: mf-page-in 260ms ease forwards;
+}
+
 /*Basic design - bare minimum*/
 @layer base {
   html, body {

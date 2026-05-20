@@ -196,6 +196,7 @@ export default function GrowingSetupPage() {
               <li key={plant.id}>
                 {/* TODO: simplify to /plants/:plantId once nested URL hierarchy is revisited */}
                 <Link
+                  viewTransition
                   to={`/setup/${id}/sensor/${plant.sensorId}/plant/${plant.id}`}
                   className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-mf-md border border-mf-line hover:border-mf-forest/30 hover:bg-mf-forest/5 transition-colors"
                 >

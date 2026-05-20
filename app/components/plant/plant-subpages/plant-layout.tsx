@@ -121,14 +121,19 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
             <p id="plant-species">{plant?.type ?? "Plant species"}</p>
           </div>
           <div className="data-container">
-            <div className="tabs-header">
+            <div className="flex gap-1 p-1 bg-mf-cream rounded-full mb-1">
               {tabs.map((tab) => (
                 <NavLink
                   key={tab.name}
                   to={tab.path}
                   end={tab.path === "." || tab.path === ""}
+                  viewTransition
                   className={({ isActive }) =>
-                    `tab-button ${isActive ? "active" : ""}`
+                    `flex flex-1 h-9 items-center justify-center rounded-full text-[13px] font-medium no-underline border-0 transition-all duration-150 px-3 whitespace-nowrap ${
+                      isActive
+                        ? "bg-mf-card text-mf-ink shadow-mf-1"
+                        : "bg-transparent text-mf-ink-2 hover:bg-mf-card/60"
+                    }`
                   }
                 >
                   {tab.name}

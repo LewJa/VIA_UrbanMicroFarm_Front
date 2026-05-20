@@ -1,8 +1,8 @@
 import type { Plant } from "~/model/plant/types";
 
 const PLANTS: Plant[] = [
-  { id: 1, name: "Tomato", description: "Cherry tomato", type: "Vegetable", datePlanted: "2026-04-10", status: "Healthy" },
-  { id: 2, name: "Basil", description: "Sweet basil", type: "Herb", datePlanted: "2026-05-01", status: "Needs Water" },
+  { id: 1, sensorId: 101, name: "Tomato", description: "Cherry tomato", type: "Vegetable", datePlanted: "2026-04-10", status: "Healthy" },
+  { id: 2, sensorId: 102, name: "Basil", description: "Sweet basil", type: "Herb", datePlanted: "2026-05-01", status: "Needs Water" },
 ];
 
 export const mockPlants = {

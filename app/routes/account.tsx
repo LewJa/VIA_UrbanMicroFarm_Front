@@ -274,7 +274,7 @@ export default function AccountPage() {
     try {
       await userService.deleteAccount(user.id);
       logout();
-      navigate("/login", { replace: true });
+      navigate("/login", { replace: true, viewTransition: true });
     } catch {
       setApiError("Could not delete account. Please try again.");
       setSaving(false);
@@ -292,7 +292,7 @@ export default function AccountPage() {
         {/* Header row */}
         <div className="w-full flex items-center justify-between px-4 mb-6">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(-1, { viewTransition: true } as any)}
             className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/6 transition-colors"
             aria-label="Go back"
           >
@@ -500,7 +500,7 @@ export default function AccountPage() {
             </ExpandPanel>
 
             <RowButton
-              onClick={() => { logout(); navigate("/login", { replace: true }); }}
+              onClick={() => { logout(); navigate("/login", { replace: true, viewTransition: true }); }}
               isOpen={false}
               label="Log out"
               hasDivider={false}

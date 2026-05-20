@@ -48,7 +48,7 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
 
 
   return (
-    <Link to={`/setup/${setupId}`} state={{ location: locationName, status: status ?? "" }}
+    <Link viewTransition to={`/setup/${setupId}`} state={{ location: locationName, status: status ?? "" }}
                 className="mf-card overflow-hidden flex flex-col group hover:shadow-mf-2 transition-shadow">
         <div className="mf-photo mf-photo-leaf h-32 relative">
             <span className="opacity-70">{locationName.toLowerCase()}</span>

@@ -6,6 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -92,13 +93,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 import { Navbar } from "./components/navbar/Navbar";
 
+const AUTH_PATHS = new Set(["/login", "/register"]);
+
 export default function App() {
+  const location = useLocation();
+  const isAuthPage = AUTH_PATHS.has(location.pathname);
+
   return (
     <AuthProvider>
       <ThemeApplier />
       <div className="min-h-screen flex flex-col md:block">
-        <Navbar />
-        <div className="flex-1 overflow-auto md:mt-0 pb-20 md:pb-0">
+        {!isAuthPage && <Navbar />}
+        <div className={`flex-1 overflow-auto${isAuthPage ? "" : " pb-20 md:pb-0"}`}>
           <Outlet />
         </div>
       </div>

@@ -141,12 +141,17 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId 
     <div>
       <h3>{title}</h3>
 
-      <div role="group" aria-label="Time range">
+      <div role="group" aria-label="Time range" className="flex gap-1 p-1 bg-mf-cream rounded-full w-fit my-3">
         {RANGES.map((r) => (
           <button
             key={r.value}
             onClick={() => setRange(r.value)}
             aria-pressed={range === r.value}
+            className={`h-8 px-3 rounded-full text-[13px] font-medium cursor-pointer border-0 transition-all duration-150 ${
+              range === r.value
+                ? "bg-mf-card text-mf-ink shadow-mf-1"
+                : "bg-transparent text-mf-ink-2 hover:bg-mf-card/60"
+            }`}
           >
             {r.label}
           </button>
