@@ -16,15 +16,16 @@ export default function PlantRoute() {
   return (
 
     <PlantCard
-      name="Sweet basil"
-      type="Lamiaceae"
-      lastWatered="6h"
-      sunlight="6.4 hrs"
-      moisture={62}
-      temperature={22}
-      humidity={64}
-      light={68}
-    />
+  name="Basil"
+  type="Herb"
+  lastWatered="6h"
+  sunlight="Full"
+  createdAt={new Date().toISOString()}
+  moisture={62}
+  temperature={24}
+  humidity={55}
+  light={80}
+/>
 
   );
 }

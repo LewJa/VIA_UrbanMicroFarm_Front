@@ -110,12 +110,11 @@ export default function GrowingSetupPage() {
         setPlants(plantData);
 
         setSetup({
-          id,
-          location:
-            navLocation ?? `Setup #${id}`,
-          status:
-            navStatus ?? "",
-        });
+  id,
+  location: navLocation ?? `Setup #${id}`,
+  status: navStatus ?? "",
+  createdAt: new Date().toISOString(),
+});
 
         setPageStatus("success");
 

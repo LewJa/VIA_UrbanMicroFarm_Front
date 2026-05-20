@@ -7,6 +7,7 @@ interface PlantCardProps {
   type: string;
   lastWatered: string;
   sunlight: string;
+  createdAt: string;
   moisture: number;
   temperature: number;
   humidity: number;
@@ -19,6 +20,7 @@ export default function PlantCard({
   type,
   lastWatered,
   sunlight,
+  createdAt,
   moisture,
   temperature,
   humidity,
@@ -233,7 +235,17 @@ export default function PlantCard({
 
             <div className="details-row">
               <span>Planted</span>
-              <span>April 12, 2026</span>
+
+              <span>
+                {new Date(createdAt).toLocaleDateString(
+                  "en-US",
+                  {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  }
+                )}
+              </span>
             </div>
 
           </div>

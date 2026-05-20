@@ -28,11 +28,20 @@
         <span>Herb · Lamiaceae</span>
       </div>
 
-      <div className="details-row">
-        <span>Planted</span>
-        <span>April 12, 2026</span>
-      </div>
+   <div className="details-row">
+  <span>Planted</span>
 
+  <span>
+    {new Date(createdAt).toLocaleDateString(
+      "en-US",
+      {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }
+    )}
+  </span>
+</div>
     </div>
 
   </div>
