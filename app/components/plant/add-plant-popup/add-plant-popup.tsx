@@ -77,12 +77,12 @@ export function AddPlantModal({
   return (
     <div className={`modal-overlay${isClosing ? " is-closing" : ""}`}>
       {submitStatus === "success" && (
-        <div className="bg-[#FAF8F5] rounded-3xl p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
+        <div className="bg-[#FAF8F5] rounded-3xl p-5 sm:p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
             <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4 text-green-800">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
             </div>
             <h2 className="text-xl font-serif font-semibold text-gray-900 mb-2">Success!</h2>
-            <p className="text-gray-600 mb-8 text-center text-sm">Your new plant has been successfully added to this setup.</p>
+            <p className="text-gray-600 mb-5 sm:mb-8 text-center text-sm">Your new plant has been successfully added to this setup.</p>
             <button
                 onClick={() => {
                     onContinue({ name, type, sensorId: sensorId as number });
@@ -95,12 +95,12 @@ export function AddPlantModal({
         </div>
       )}
       {submitStatus === "error" && (
-        <div className="bg-[#FAF8F5] rounded-3xl p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
+        <div className="bg-[#FAF8F5] rounded-3xl p-5 sm:p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
             <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 text-red-800">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </div>
             <h2 className="text-xl font-serif font-semibold text-gray-900 mb-2">Error</h2>
-            <p className="text-gray-600 mb-8 text-center text-sm">We couldn't add your plant: {errorMessage}</p>
+            <p className="text-gray-600 mb-5 sm:mb-8 text-center text-sm">We couldn't add your plant: {errorMessage}</p>
             <button
                 onClick={() => setSubmitStatus(null)}
                 className="w-full rounded-full py-2 px-6 bg-[#2B4522] text-white font-medium hover:bg-green-900 transition-colors"
@@ -179,13 +179,13 @@ export function AddPlantModal({
                   <label htmlFor="sensorId" className="input-label">
                     Moisture sensor
                   </label>
-                  <div className="flex flex-row">
+                  <div className="flex flex-row flex-wrap gap-2">
                     {sensorList.length === 0 && (
                         <p className="text-sm text-mf-ink-3">No moisture sensors detected.</p>
                     )}
                     {sensorList.map((sensor) => (
                         <button
-                            className={`p-1 rounded transition-colors ${sensorId === sensor.id ? "bg-mf-warn/60" : "bg-mf-warn/15 hover:bg-mf-warn/60"}`}
+                            className={`min-h-[44px] px-3 py-2 rounded transition-colors ${sensorId === sensor.id ? "bg-mf-warn/60" : "bg-mf-warn/15 hover:bg-mf-warn/60"}`}
                             key={sensor.id}
                             type="button"
                             onClick={() => {

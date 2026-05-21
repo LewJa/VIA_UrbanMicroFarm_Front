@@ -15,6 +15,13 @@ import {
 
 import userEvent from "@testing-library/user-event";
 
+vi.mock("react-router", () => ({
+  useParams: () => ({
+    plantId: "1",
+    setupId: "1",
+  }),
+}));
+
 import ManualWatering
   from "../manual-watering";
 

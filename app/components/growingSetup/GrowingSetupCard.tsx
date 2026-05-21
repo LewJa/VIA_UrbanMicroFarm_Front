@@ -64,14 +64,13 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
         const plant = plants[index];
         if (plant) {
             return (
-                <div key={plant.id || index} className="mf-photo mf-photo-leaf h-32 relative rounded-mf-md">
+                <div key={plant.id || index} className="mf-photo mf-photo-leaf h-24 sm:h-32 relative rounded-mf-md">
                     <span className="opacity-70">{plant.name || plant.type}</span>
                 </div>
             );
         }
         return (
-            <div key={`empty-${index}`} className="w-full min-h-20 relative overflow-hidden flex items-center justify-center
-    font-mono text-[11px] uppercase tracking-[.04em] rounded-mf-md border border-dashed border-[#d9cfb8] bg-[#f4eedb]/30 text-[#d9cfb8]">
+            <div key={`empty-${index}`} className="w-full min-h-20 relative overflow-hidden flex items-center justify-center font-mono text-[11px] uppercase tracking-[.04em] rounded-mf-md border border-dashed border-mf-line-2 bg-mf-cream/30 text-mf-line-2">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -92,7 +91,7 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
                     </div>
                 </header>
 
-                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.max(sensors.length, 1)}, 1fr)` }} className="gap-2.5">
+                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(Math.max(sensors.length, 1), 2)}, 1fr)` }} className="gap-2.5">
                     {slots}
                 </div>
 
@@ -124,7 +123,7 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
                         <ReadingTile
                             icon={<SunIcon />}
                             label="Light"
-                            value={setupReadings.light/1023}
+                            value={Math.round(setupReadings.light / 10.23)}
                             unit="%"
                             tone="leaf"
                         />

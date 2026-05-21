@@ -37,6 +37,8 @@ export default function GrowingSetupPage() {
 
     const [activeTab, setActiveTab] = useState("Plants");
     const [isWatering, setIsWatering] = useState(false);
+    const [isConfirmWateringOpen, setIsConfirmWateringOpen] = useState(false);
+    const [wateringMessage, setWateringMessage] = useState<{ text: string; ok: boolean } | null>(null);
 
     useEffect(() => {
         let alive = true;
@@ -86,15 +88,19 @@ export default function GrowingSetupPage() {
 
     const handleManualWatering = async () => {
         if (!plants.length) {
-            alert("No plants to water in this setup.");
+            setWateringMessage({ text: "No plants to water in this setup.", ok: false });
             return;
         }
+        setIsConfirmWateringOpen(false);
+        setIsWatering(true);
+        setWateringMessage(null);
         try {
-            setIsWatering(true);
             await wateringService.triggerManualWatering(plants[0].id);
-            alert("Watering triggered successfully!");
-        } catch (error) {
-            alert("Failed to trigger watering.");
+            setWateringMessage({ text: "Watering triggered successfully!", ok: true });
+            setTimeout(() => setWateringMessage(null), 3000);
+        } catch {
+            setWateringMessage({ text: "Failed to trigger watering.", ok: false });
+            setTimeout(() => setWateringMessage(null), 3000);
         } finally {
             setIsWatering(false);
         }
@@ -128,48 +134,55 @@ export default function GrowingSetupPage() {
 
     return (
         <div className="px-4 sm:px-6 xl:px-12 w-full max-w-150 lg:max-w-full lg:mx-auto">
+            <button
+                onClick={() => navigate("/")}
+                className="flex items-center gap-1.5 mb-5 text-[13px] font-medium text-mf-ink-3 hover:text-mf-ink transition-colors"
+            >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                Home
+            </button>
             <div className="lg:grid lg:grid-cols-2 lg:gap-10 mb-6 lg:mb-10">
                 <div className="w-full aspect-16/10 sm:aspect-video lg:aspect-auto lg:h-full rounded-3xl mf-photo-leaf flex items-center justify-center mb-6 lg:mb-0 min-h-50">
                     <span className="text-[#6b8a4d]/70 font-mono tracking-widest text-xs font-bold">{setup?.location.toUpperCase()}</span>
                 </div>
 
                 <div className="flex flex-col justify-center">
-                    <h2 className="font-serif text-[32px] sm:text-[40px] tracking-tight text-[#1a2119] mb-4">
+                    <h2 className="font-serif text-[32px] sm:text-[40px] tracking-tight text-mf-ink mb-4">
                         {locationName}
                     </h2>
 
-                    <div className="rounded-[20px] bg-white border border-[#e6dfce] p-5 shadow-sm">
-                        <div className="text-[10px] uppercase font-bold tracking-widest text-[#a8a492] mb-3">Live Readings</div>
+                    <div className="rounded-[20px] bg-mf-card border border-mf-line p-5 shadow-mf-1">
+                        <div className="text-[10px] uppercase font-bold tracking-widest text-mf-ink-4 mb-3">Live Readings</div>
 
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-3 gap-2 sm:gap-4">
                             <div className="flex flex-col">
-                                <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-[#a8a492]">
+                                <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-mf-ink-4">
                                     <ThermometerIcon />
                                     <span>Temp</span>
                                 </div>
-                                <div className="flex items-baseline gap-1 mt-1.5 text-[#1a2119]">
-                                    <span className="font-bold text-[22px] sm:text-[24px]">{reading?.temperature ?? "--"}</span>
-                                    <span className="text-[13px] font-bold">&deg;</span>
+                                <div className="flex items-baseline gap-1 mt-1.5 text-mf-ink">
+                                    <span className="font-bold text-[18px] sm:text-[22px]">{reading?.temperature ?? "--"}</span>
+                                    <span className="text-[11px] sm:text-[13px] font-bold">&deg;</span>
                                 </div>
                             </div>
                             <div className="flex flex-col">
-                                <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-[#a8a492]">
+                                <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-mf-ink-4">
                                     <DropIcon />
                                     <span>Humidity</span>
                                 </div>
-                                <div className="flex items-baseline gap-1 mt-1.5 text-[#1a2119]">
-                                    <span className="font-bold text-[22px] sm:text-[24px]">{reading?.humidity ?? "--"}</span>
-                                    <span className="text-[13px] font-bold">%</span>
+                                <div className="flex items-baseline gap-1 mt-1.5 text-mf-ink">
+                                    <span className="font-bold text-[18px] sm:text-[22px]">{reading?.humidity ?? "--"}</span>
+                                    <span className="text-[11px] sm:text-[13px] font-bold">%</span>
                                 </div>
                             </div>
                             <div className="flex flex-col">
-                                <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-[#a8a492]">
+                                <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-mf-ink-4">
                                     <SunIcon />
                                     <span>Light</span>
                                 </div>
-                                <div className="flex items-baseline gap-1 mt-1.5 text-[#1a2119]">
-                                    <span className="font-bold text-[22px] sm:text-[24px]">{reading?.light ? Math.round(reading.light / 10.23) : "--"}</span>
-                                    <span className="text-[13px] font-bold">%</span>
+                                <div className="flex items-baseline gap-1 mt-1.5 text-mf-ink">
+                                    <span className="font-bold text-[18px] sm:text-[22px]">{reading?.light ? Math.round(reading.light / 10.23) : "--"}</span>
+                                    <span className="text-[11px] sm:text-[13px] font-bold">%</span>
                                 </div>
                             </div>
                         </div>
@@ -182,7 +195,7 @@ export default function GrowingSetupPage() {
                     {["Plants", "Details", "Sensors"].map(tab => (
                         <button
                             key={tab}
-                            className={`mf-tab transition-colors flex-1 ${activeTab === tab ? "bg-white text-[#1a2119] shadow-sm font-semibold" : "text-[#7a7768] hover:text-[#1a2119]"}`}
+                            className={`mf-tab transition-colors flex-1 ${activeTab === tab ? "bg-mf-card text-mf-ink shadow-mf-1 font-semibold" : "text-mf-ink-3 hover:text-mf-ink"}`}
                             aria-selected={activeTab === tab}
                             onClick={() => setActiveTab(tab)}
                         >
@@ -197,7 +210,7 @@ export default function GrowingSetupPage() {
                     {activeTab === "Plants" && (
                         <>
                             <div className="flex items-center justify-between mb-5 lg:mb-6">
-                                <div className="text-[11px] sm:text-[12px] uppercase tracking-widest text-[#a8a492] font-semibold">
+                                <div className="text-[11px] sm:text-[12px] uppercase tracking-widest text-mf-ink-4 font-semibold">
                                     {plants.length} OF {maxSlots} SLOTS OCCUPIED
                                 </div>
                             </div>
@@ -214,8 +227,8 @@ export default function GrowingSetupPage() {
                                                     <span className="text-[#6b8a4d]/75 text-[9px] font-bold tracking-widest leading-tight mt-auto mb-auto">PLANT<br/>PHOTO</span>
                                                 </div>
                                                 <div className="flex flex-col gap-0.5">
-                                                    <span className="font-serif font-bold text-[18px] sm:text-[20px] text-[#1a2119] capitalize">{plant.name}</span>
-                                                    <span className="text-[11px] uppercase tracking-widest text-[#a8a492] font-semibold mt-0.5">slot {index + 1}</span>
+                                                    <span className="font-serif font-bold text-[18px] sm:text-[20px] text-mf-ink capitalize">{plant.name}</span>
+                                                    <span className="text-[11px] uppercase tracking-widest text-mf-ink-4 font-semibold mt-0.5">slot {index + 1}</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 md:gap-4 pr-1 sm:pr-2">
@@ -235,24 +248,24 @@ export default function GrowingSetupPage() {
                                                         <span className="text-[12px] font-bold tracking-wide pl-1">ok</span>
                                                     </div>
                                                 )}
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a8a492" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-mf-ink-4"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                             </div>
                                         </div>
                                     );
                                 })}
 
                                 {plants.length >= 0 && (
-                                    <div className="rounded-[16px] border-[1.5px] border-dashed border-[#d9cfb8] bg-[#FAF6EE] hover:bg-white p-3 sm:p-4 flex items-center justify-between hover:border-[#b89968] transition-colors cursor-pointer group" onClick={() => setIsModalOpen(true)}>
+                                    <div className="rounded-[16px] border-[1.5px] border-dashed border-mf-line-2 bg-mf-cream hover:bg-mf-card p-3 sm:p-4 flex items-center justify-between hover:border-mf-clay-2 transition-colors cursor-pointer group" onClick={() => setIsModalOpen(true)}>
                                         <div className="flex items-center gap-4">
-                                            <div className="w-[60px] h-[60px] sm:w-[68px] sm:h-[68px] rounded-xl border border-dashed border-[#d9cfb8] bg-white flex items-center justify-center text-[#d9cfb8] group-hover:border-[#b89968] group-hover:text-[#b89968] transition-colors">
+                                            <div className="w-[60px] h-[60px] sm:w-[68px] sm:h-[68px] rounded-xl border border-dashed border-mf-line-2 bg-mf-card flex items-center justify-center text-mf-line-2 group-hover:border-mf-clay-2 group-hover:text-mf-clay-2 transition-colors">
                                                 <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" width="22" height="22"><path d="M12 5v14M5 12h14"/></svg>
                                             </div>
                                             <div className="flex flex-col gap-0.5">
-                                                <span className="font-serif font-bold text-[18px] sm:text-[20px] text-[#1a2119]">Empty slot</span>
-                                                <span className="text-[11px] uppercase tracking-widest text-[#a8a492] font-semibold mt-0.5">slot {plants.length + 1}</span>
+                                                <span className="font-serif font-bold text-[18px] sm:text-[20px] text-mf-ink">Empty slot</span>
+                                                <span className="text-[11px] uppercase tracking-widest text-mf-ink-4 font-semibold mt-0.5">slot {plants.length + 1}</span>
                                             </div>
                                         </div>
-                                        <div className="pr-3 sm:pr-4 text-[13px] font-bold text-[#8a6f4a]">
+                                        <div className="pr-3 sm:pr-4 text-[13px] font-bold text-mf-clay">
                                             Add plant
                                         </div>
                                     </div>
@@ -261,30 +274,48 @@ export default function GrowingSetupPage() {
                         </>
                     )}
                     {activeTab === "Details" && (
-                        <div className="p-8 text-center text-[#a8a492] font-medium border border-dashed border-[#d9cfb8] rounded-[16px]">
+                        <div className="p-8 text-center text-mf-ink-4 font-medium border border-dashed border-mf-line-2 rounded-[16px]">
                             Details section coming soon...
                         </div>
                     )}
                     {activeTab === "Sensors" && (
-                        <div className="p-8 text-center text-[#a8a492] font-medium border border-dashed border-[#d9cfb8] rounded-[16px]">
+                        <div className="p-8 text-center text-mf-ink-4 font-medium border border-dashed border-mf-line-2 rounded-[16px]">
                             Sensors section coming soon...
                         </div>
                     )}
+
+                    <div className="lg:hidden mt-6 mb-4">
+                        <div className="text-[10px] uppercase font-bold tracking-widest text-mf-ink-4 mb-3">Quick actions</div>
+                        <div className="grid grid-cols-3 gap-3">
+                            <button onClick={() => setIsModalOpen(true)} className="mf-card flex flex-col items-center gap-2 py-4 px-2 text-[12px] font-medium text-mf-ink hover:bg-mf-cream transition-colors">
+                                <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" width="20" height="20" className="text-mf-ink"><path d="M12 5v14M5 12h14"/></svg>
+                                Add plant
+                            </button>
+                            <button onClick={() => setIsConfirmWateringOpen(true)} disabled={isWatering} className="mf-card flex flex-col items-center gap-2 py-4 px-2 text-[12px] font-medium text-mf-ink hover:bg-mf-cream transition-colors disabled:opacity-50">
+                                <DropIcon />
+                                {isWatering ? "Watering…" : "Water"}
+                            </button>
+                            <button onClick={() => alert("More options coming soon!")} className="mf-card flex flex-col items-center gap-2 py-4 px-2 text-[12px] font-medium text-mf-ink hover:bg-mf-cream transition-colors">
+                                <MoreDotsIcon />
+                                Edit
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="hidden lg:block w-[320px] shrink-0 space-y-5">
-                    <div className="mf-card p-6 border-[#e6dfce] bg-transparent shadow-none">
-                        <div className="text-[10px] uppercase font-bold tracking-widest text-[#a8a492] mb-4">Quick actions</div>
+                    <div className="mf-card p-6">
+                        <div className="text-[10px] uppercase font-bold tracking-widest text-mf-ink-4 mb-4">Quick actions</div>
                         <div className="space-y-2.5">
-                            <button onClick={() => setIsModalOpen(true)} className="w-full text-left bg-white border border-[#e6dfce] rounded-[14px] px-4 py-3.5 flex items-center gap-3.5 text-[14px] font-medium text-[#1a2119] hover:bg-[#FAF6EE] shadow-sm transition-colors">
-                                <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" width="18" height="18" className="text-[#1a2119]"><path d="M12 5v14M5 12h14"/></svg>
+                            <button onClick={() => setIsModalOpen(true)} className="w-full text-left bg-mf-card border border-mf-line rounded-[14px] px-4 py-3.5 flex items-center gap-3.5 text-[14px] font-medium text-mf-ink hover:bg-mf-cream shadow-mf-1 transition-colors">
+                                <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" width="18" height="18" className="text-mf-ink"><path d="M12 5v14M5 12h14"/></svg>
                                 Add plant
                             </button>
-                            <button onClick={handleManualWatering} disabled={isWatering} className="w-full text-left bg-white border border-[#e6dfce] rounded-[14px] px-4 py-3.5 flex items-center gap-3.5 text-[14px] font-medium text-[#1a2119] hover:bg-[#FAF6EE] shadow-sm transition-colors disabled:opacity-50">
+                            <button onClick={() => setIsConfirmWateringOpen(true)} disabled={isWatering} className="w-full text-left bg-mf-card border border-mf-line rounded-[14px] px-4 py-3.5 flex items-center gap-3.5 text-[14px] font-medium text-mf-ink hover:bg-mf-cream shadow-mf-1 transition-colors disabled:opacity-50">
                                 <DropIcon />
-                                {isWatering ? "Watering..." : "Manual watering"}
+                                {isWatering ? "Watering…" : "Manual watering"}
                             </button>
-                            <button onClick={() => alert("More options coming soon!")} className="w-full text-left bg-white border border-[#e6dfce] rounded-[14px] px-4 py-3.5 flex items-center gap-3.5 text-[14px] font-medium text-[#1a2119] hover:bg-[#FAF6EE] shadow-sm transition-colors">
+                            <button onClick={() => alert("More options coming soon!")} className="w-full text-left bg-mf-card border border-mf-line rounded-[14px] px-4 py-3.5 flex items-center gap-3.5 text-[14px] font-medium text-mf-ink hover:bg-mf-cream shadow-mf-1 transition-colors">
                                 <MoreDotsIcon />
                                 Edit location & nickname
                             </button>
@@ -292,6 +323,36 @@ export default function GrowingSetupPage() {
                     </div>
                 </div>
             </div>
+
+            {isConfirmWateringOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-mf-card border border-mf-line rounded-[20px] p-7 w-[90%] max-w-sm text-center shadow-mf-3">
+                        <h2 className="font-serif text-[22px] text-mf-ink mb-2">Confirm watering</h2>
+                        <p className="text-[14px] text-mf-ink-2 mb-6">Are you sure you want to trigger manual watering for this setup?</p>
+                        <div className="flex gap-3 justify-center">
+                            <button
+                                className="mf-btn mf-btn-secondary"
+                                onClick={() => setIsConfirmWateringOpen(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="mf-btn mf-btn-primary disabled:opacity-50"
+                                onClick={handleManualWatering}
+                                disabled={isWatering}
+                            >
+                                {isWatering ? "Watering…" : "Confirm"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {wateringMessage && (
+                <div className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-medium shadow-mf-2 z-50 ${wateringMessage.ok ? "bg-mf-forest text-[#F4EEDB]" : "bg-mf-err text-[#F4EEDB]"}`}>
+                    {wateringMessage.text}
+                </div>
+            )}
 
             {isModalOpen && (
                 <AddPlantModal

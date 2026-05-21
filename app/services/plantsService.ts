@@ -19,7 +19,7 @@ export const getPlant = async (
 ): Promise<Plant> => {
   if (isMockEnabled) return mockPlants.getPlant(plantId);
   const response = await api.get<Plant>(
-    `/plants/${plantId}`,
+    `/api/plants/${plantId}`,
   );
 
   return response.data;
@@ -30,7 +30,7 @@ export const getPlantBySensor = async (
 ): Promise<Plant> => {
   if (isMockEnabled) return mockPlants.getPlantForSensor(sensorId);
   const response = await api.get<Plant>(
-    `/sensors/${sensorId}/plant`,
+    `/api/sensors/${sensorId}/plant`,
   );
 
   return response.data;
@@ -46,7 +46,7 @@ export const addPlant = async (
 ): Promise<Plant> => {
   if (isMockEnabled) return mockPlants.addPlant(plantData);
   const response = await api.post<Plant>(
-    "/plants",
+    "/api/plants",
     plantData,
   );
 
@@ -62,7 +62,7 @@ export const updatePlant = async (
 ): Promise<Plant> => {
   if (isMockEnabled) return mockPlants.updatePlant(plantId, updatedData);
   const response = await api.patch<Plant>(
-    `/plants/${plantId}`,
+    `/api/plants/${plantId}`,
     updatedData,
   );
 
@@ -74,7 +74,7 @@ export const removePlant = async (
 ): Promise<{ message: string }> => {
   if (isMockEnabled) return mockPlants.removePlant(plantId);
   const response = await api.delete<{ message: string }>(
-    `/plants/${plantId}`,
+    `/api/plants/${plantId}`,
   );
 
   return response.data;

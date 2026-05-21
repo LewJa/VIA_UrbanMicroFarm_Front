@@ -82,7 +82,7 @@ export default function RegisterPage() {
 
         {/* Heading */}
         <div className="mb-7">
-          <h1 className="font-serif font-normal text-[38px] leading-[1.05] tracking-[-0.76px] text-mf-ink">
+          <h1 className="font-serif font-normal text-[28px] sm:text-[38px] leading-[1.05] tracking-[-0.76px] text-mf-ink">
             Join <em>microfarm</em>
           </h1>
           <p className="mt-2 text-[14px] text-mf-ink-3 leading-snug">

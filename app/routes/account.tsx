@@ -140,7 +140,7 @@ function RowButton({
         {label}
       </span>
       {value && (
-        <span className="text-[13px] text-mf-ink-3 truncate max-w-[110px] mr-1">{value}</span>
+        <span className="text-[13px] text-mf-ink-3 truncate max-w-[80px] sm:max-w-[110px] mr-1">{value}</span>
       )}
       <ChevronIcon open={isOpen} />
     </button>

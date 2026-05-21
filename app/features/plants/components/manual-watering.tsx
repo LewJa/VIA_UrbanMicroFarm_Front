@@ -1,25 +1,29 @@
 import { useState } from "react";
+import { useParams } from "react-router";
+import type { WateringEvent } from "../../../model/growingSetup/types";
 import { wateringService } from "../../../services/wateringService";
 
 export default function ManualWatering() {
+
+  const { plantId, setupId } = useParams();
 
   const [message, setMessage] =
     useState("");
 
   const [lastEvent, setLastEvent] =
-    useState<any>(null);
+    useState<WateringEvent | null>(null);
 
   const handleWatering = async () => {
 
     const result =
       await wateringService
-        .triggerManualWatering(1);
+        .triggerManualWatering(Number(plantId));
 
     setMessage(result.message);
 
     const event =
       await wateringService
-        .getLastWateringEvent(1);
+        .getLastWateringEvent(Number(setupId));
 
     setLastEvent(event);
   };

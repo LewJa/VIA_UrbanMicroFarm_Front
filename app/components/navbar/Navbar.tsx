@@ -40,7 +40,7 @@ export function Navbar() {
   return (
     <>
       <header className="flex justify-between items-center px-4 py-4 md:px-8 md:py-6 relative z-10">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-3 md:gap-8">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 flex items-center justify-center">
               <SproutIcon />
