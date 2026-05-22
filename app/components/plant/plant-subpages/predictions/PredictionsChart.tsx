@@ -8,9 +8,20 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
+  ComposedChart, Area,
 } from "recharts";
 import { predictionService } from "~/services/predictionService";
 import type { Prediction } from "~/model/prediction/types";
+
+const COLOR = {
+  line:    "#5A7B8C", // mf-water — predictions are about water
+  fill:    "rgba(90,123,140,.10)",
+  avg:     "#8A6F4A", // mf-clay — reference line stands out warmly
+  grid:    "#E6DFCE", // mf-line
+  axis:    "#A8A492", // mf-ink-4
+  card:    "#FFFFFF",
+};
+
 
 type Range = "7d" | "30d" | "60d";
 
@@ -91,126 +102,200 @@ export default function PredictionsChart({ plantId, plantName }: Props) {
     fetchData();
   }, [fetchData]);
 
-  const title = plantName ? `${plantName} — Water Predictions` : "Water Amount Predictions";
+  const min = chartData.length ? Math.min(...chartData.map((p) => p.value)) : 0;
+  const max = chartData.length ? Math.max(...chartData.map((p) => p.value)) : 0;
 
   return (
-    <div>
-      <h3>{title}</h3>
+    <div className="mf-card p-5 sm:p-6 flex flex-col gap-5">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="mf-eyebrow">Water predictions</p>
+          <h3 className="mf-h2 text-2xl mt-1 text-mf-ink">
+            {plantName ? (
+                <>
+                  Forecast for{" "}
+                  <em className="not-italic text-mf-forest" style={{ fontStyle: "italic" }}>
+                    {plantName}
+                  </em>
+                </>
+            ) : (
+                "Water amount predictions"
+            )}
+          </h3>
+        </div>
 
-      <div role="group" aria-label="Time range" className="flex gap-1 p-1 bg-mf-cream rounded-full w-fit my-3">
-        {RANGES.map((r) => (
-          <button
-            key={r.value}
-            onClick={() => setRange(r.value)}
-            aria-pressed={range === r.value}
-            className={`h-8 px-3 rounded-full text-[13px] font-medium cursor-pointer border-0 transition-all duration-150 ${
-              range === r.value
-                ? "bg-mf-card text-mf-ink shadow-mf-1"
-                : "bg-transparent text-mf-ink-2 hover:bg-mf-card/60"
-            }`}
-          >
-            {r.label}
-          </button>
-        ))}
-      </div>
+        {/* Range segmented control */}
+        <div role="group" aria-label="Time range" className="mf-tabs">
+          {RANGES.map((r) => (
+              <button
+                  key={r.value}
+                  onClick={() => setRange(r.value)}
+                  aria-pressed={range === r.value}
+                  className="mf-tab px-3 "
+                  aria-selected={range === r.value}
+              >
+                {r.label}
+              </button>
+          ))}
+        </div>
+      </header>
+
+
+      {status === "success" && (
+          <div className="grid grid-cols-3 gap-px bg-mf-line rounded-mf-md overflow-hidden">
+            <Stat label="Average" value={average.toFixed(2)} unit="L" emphasized />
+            <Stat label="Min" value={min.toFixed(2)} unit="L" />
+            <Stat label="Max" value={max.toFixed(2)} unit="L" />
+          </div>
+      )}
+
 
       {status === "loading" && (
-        <div aria-busy="true" aria-label="Loading prediction data">
-          Loading…
-        </div>
+          <div
+              aria-busy="true"
+              aria-label="Loading prediction data"
+              className="h-75 bg-mf-cream/50 rounded-mf-md animate-pulse"
+          />
       )}
 
       {status === "error" && (
-        <div role="alert">
-          <p>{errorMessage}</p>
-          <button onClick={fetchData}>Retry</button>
-        </div>
+          <div
+              role="alert"
+              className="flex items-center justify-between gap-4 p-4 rounded-mf-md
+                     bg-[#F4DBD2]/40 border border-[#E9C3B5]"
+          >
+            <p className="text-sm text-mf-ink-2">{errorMessage}</p>
+            <button onClick={fetchData} className="mf-btn mf-btn-secondary mf-btn-sm">
+              Retry
+            </button>
+          </div>
       )}
 
       {status === "empty" && (
-        <p>
-          No predictions available for this period. Predictions are generated
-          daily once your plant has enough sensor history.
-        </p>
+          <div className="rounded-mf-md border border-dashed border-mf-line-2
+                        bg-mf-cream/40 p-8 text-center">
+            <p className="text-sm text-mf-ink-3 max-w-sm mx-auto">
+              No predictions available for this period. Predictions are generated
+              daily once your plant has enough sensor history.
+            </p>
+          </div>
       )}
 
       {status === "success" && (
-        <>
-          <div role="list" aria-label="Chart legend">
-            <div role="listitem" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginRight: 16 }}>
-              <span
-                aria-hidden="true"
-                style={{ display: "inline-block", width: 24, height: 3, borderRadius: 2, background: "#3b82f6" }}
-              />
-              Predicted Water (L)
+          <>
+            {/* Legend */}
+            <div role="list" aria-label="Chart legend" className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-mf-ink-2">
+            <span role="listitem" className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true" className="inline-block"
+                    style={{ width: 22, height: 2.5, borderRadius: 2, background: COLOR.line }} />
+              <span>Predicted water (L)</span>
+            </span>
+              <span role="listitem" className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true" className="inline-block"
+                    style={{
+                      width: 22, height: 0,
+                      borderTop: `2px dashed ${COLOR.avg}`,
+                    }} />
+              <span>Avg {average} L</span>
+            </span>
             </div>
-            <div role="listitem" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-              <span
-                aria-hidden="true"
-                style={{ display: "inline-block", width: 24, height: 2, borderRadius: 1, background: "#f97316", opacity: 0.7, borderTop: "2px dashed #f97316" }}
-              />
-              {`avg ${average} L`}
+
+            <div className="-mx-2">
+              <ResponsiveContainer width="100%" height={300}>
+                <ComposedChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
+                  <defs>
+                    <linearGradient id="predFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={COLOR.line} stopOpacity={0.18} />
+                      <stop offset="100%" stopColor={COLOR.line} stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="2 4" stroke={COLOR.grid} vertical={false} />
+                  <XAxis
+                      dataKey="time"
+                      type="number"
+                      scale="time"
+                      domain={["dataMin", "dataMax"]}
+                      tickFormatter={(ts) => formatXTick(range, ts)}
+                      stroke={COLOR.axis}
+                      tick={{ fill: COLOR.axis, fontSize: 11, fontFamily: "JetBrains Mono, monospace" }}
+                      tickLine={false}
+                      axisLine={{ stroke: COLOR.grid }}
+                  />
+                  <YAxis
+                      domain={([dataMin, dataMax]) => [
+                        Math.max(0, Math.floor((dataMin - 0.2) * 10) / 10),
+                        Math.ceil((dataMax + 0.2) * 10) / 10,
+                      ]}
+                      tickFormatter={(v) => `${v}L`}
+                      stroke={COLOR.axis}
+                      tick={{ fill: COLOR.axis, fontSize: 11, fontFamily: "JetBrains Mono, monospace" }}
+                      tickLine={false}
+                      axisLine={false}
+                      width={42}
+                  />
+                  <ReferenceLine
+                      y={average}
+                      stroke={COLOR.avg}
+                      strokeDasharray="4 4"
+                      strokeOpacity={0.85}
+                  />
+                  <Tooltip content={<PredictionTooltip />} />
+                  <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="none"
+                      fill="url(#predFill)"
+                  />
+                  <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke={COLOR.line}
+                      strokeWidth={1.8}
+                      dot={{ r: 2.5, fill: COLOR.line, strokeWidth: 0 }}
+                      activeDot={{ r: 5, strokeWidth: 2, stroke: COLOR.card, fill: COLOR.line }}
+                      connectNulls
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
             </div>
-          </div>
-
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="time"
-                type="number"
-                scale="time"
-                domain={["dataMin", "dataMax"]}
-                tickFormatter={(ts) => formatXTick(range, ts)}
-              />
-              <YAxis
-                domain={([dataMin, dataMax]) => [
-                  Math.max(0, Math.floor((dataMin - 0.2) * 10) / 10),
-                  Math.ceil((dataMax + 0.2) * 10) / 10,
-                ]}
-                tickFormatter={(v) => `${v} L`}
-                label={{ value: "Water (L)", angle: -90, position: "insideLeft" }}
-              />
-
-              <ReferenceLine
-                y={average}
-                stroke="#f97316"
-                strokeDasharray="4 4"
-                strokeOpacity={0.7}
-              />
-
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null;
-                  const point = payload[0].payload as ChartPoint;
-                  return (
-                    <div style={{ background: "#fff", border: "1px solid #e5e7eb", padding: "8px 12px", borderRadius: 6 }}>
-                      <p style={{ margin: 0, fontSize: 12, color: "#6b7280" }}>
-                        {new Date(point.createdAt).toLocaleDateString([], {
-                          weekday: "short", year: "numeric", month: "short", day: "numeric",
-                        })}
-                      </p>
-                      <p style={{ margin: "4px 0 0", fontWeight: 600, color: "#3b82f6" }}>
-                        {point.value} L predicted
-                      </p>
-                    </div>
-                  );
-                }}
-              />
-
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#3b82f6"
-                strokeWidth={2}
-                dot={{ r: 3, fill: "#3b82f6", strokeWidth: 0 }}
-                activeDot={{ r: 5, strokeWidth: 2, stroke: "#fff" }}
-                connectNulls
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </>
+          </>
       )}
     </div>
+  );
+}
+
+function Stat({
+                label, value, unit, emphasized,
+              }: { label: string; value: string; unit: string; emphasized?: boolean }) {
+  return (
+      <div className={`px-4 py-3 ${emphasized ? "bg-mf-card" : "bg-mf-card"}`}>
+        <p className="text-[10px] uppercase tracking-[.10em] font-medium text-mf-ink-3">
+          {label}
+        </p>
+        <p className={`mt-1 font-serif tracking-tight ${emphasized ? "text-2xl text-mf-ink" : "text-xl text-mf-ink-2"}`}>
+          {value}
+          <span className="text-sm text-mf-ink-3 ml-0.5">{unit}</span>
+        </p>
+      </div>
+  );
+}
+
+function PredictionTooltip({ active, payload }: any) {
+  if (!active || !payload?.length) return null;
+  const point = payload[0].payload as ChartPoint;
+  return (
+      <div className="mf-card shadow-mf-2 px-3 py-2.5 text-xs">
+        <p className="font-mono text-mf-ink-3">
+          {new Date(point.createdAt).toLocaleDateString([], {
+            weekday: "short", year: "numeric", month: "short", day: "numeric",
+          })}
+        </p>
+        <p className="mt-1 font-serif text-lg text-mf-ink tracking-tight">
+          {point.value}<span className="text-sm text-mf-ink-3 ml-0.5">L</span>
+        </p>
+        <p className="text-[10px] uppercase tracking-[.10em] text-mf-water font-medium">
+          predicted
+        </p>
+      </div>
   );
 }
