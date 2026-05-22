@@ -37,7 +37,7 @@ export function AddPlantModal({
         growingSetupsService.fetchAllAssignedSensors(setupId),
         getPlantsBySetup(setupId).catch(() => []),
       ]);
-      setSensorList(sensors.filter((s: Sensor) => s.type === "soil_moisture"));
+      setSensorList(sensors.filter((s: Sensor) => s.sensorType === "Soil_Moisture"));
       setUsedSensorIds(new Set(plants.map((p) => p.sensorId)));
     };
 
