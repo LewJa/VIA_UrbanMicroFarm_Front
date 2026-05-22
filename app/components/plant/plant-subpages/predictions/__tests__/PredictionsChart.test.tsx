@@ -10,12 +10,14 @@ vi.mock("recharts", () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="responsive-container">{children}</div>
   ),
-  LineChart: ({ children, data }: { children: React.ReactNode; data: unknown[] }) => (
+  ComposedChart: ({ children, data }: { children: React.ReactNode; data: unknown[] }) => (
     <div data-testid="line-chart" data-chart-data={JSON.stringify(data)}>
       {children}
     </div>
   ),
+  LineChart: () => null,
   Line: () => null,
+  Area: () => null,
   XAxis: () => null,
   YAxis: () => null,
   CartesianGrid: () => null,
@@ -189,7 +191,7 @@ describe("PredictionsChart", () => {
     render(<PredictionsChart plantId={1} />);
     await waitFor(() => expect(screen.getByTestId("line-chart")).toBeInTheDocument());
     // (1.0 + 2.0) / 2 = 1.5
-    expect(screen.getByText(/avg 1\.5 L/)).toBeInTheDocument();
+    expect(screen.getByText(/Avg 1\.5 L/)).toBeInTheDocument();
   });
 
   it("ReferenceLine y matches the computed average", async () => {
@@ -205,13 +207,13 @@ describe("PredictionsChart", () => {
   it("shows plant name in the heading when plantName is provided", () => {
     mockGetPredictions.mockImplementation(() => new Promise(() => {}));
     render(<PredictionsChart plantId={1} plantName="Basil" />);
-    expect(screen.getByText("Basil — Water Predictions")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("Basil");
   });
 
   it("shows generic heading when plantName is omitted", () => {
     mockGetPredictions.mockImplementation(() => new Promise(() => {}));
     render(<PredictionsChart plantId={1} />);
-    expect(screen.getByText("Water Amount Predictions")).toBeInTheDocument();
+    expect(screen.getByText("Water amount predictions")).toBeInTheDocument();
   });
 
   // ── Tooltip ────────────────────────────────────────────────────────────────
