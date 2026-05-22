@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const authUser: AuthUser = {
       id: profile.id,
       email: profile.email,
-      name: "",
+      name: profile.name ?? "",
       theme: profile.theme,
     };
     localStorage.setItem("token", newToken);

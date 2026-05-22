@@ -24,9 +24,13 @@ export default function BasicData() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch sensor reading:", err);
-        setError("Failed to load latest sensor data.");
-        setLoading(false);
+        if (err?.response?.status === 404) {
+          setLoading(false);
+        } else {
+          console.error("Failed to fetch sensor reading:", err);
+          setError("Failed to load latest sensor data.");
+          setLoading(false);
+        }
       });
   }, [plantId]);
 

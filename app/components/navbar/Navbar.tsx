@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import { useAlerts } from "~/context/AlertsContext";
 
 const SproutIcon = () => (
   <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -37,6 +38,8 @@ const UserIcon = () => (
 );
 
 export function Navbar() {
+  const { unreadCount } = useAlerts();
+
   return (
     <>
       <header className="flex justify-between items-center px-4 py-4 md:px-8 md:py-6 relative z-10">
@@ -77,9 +80,14 @@ export function Navbar() {
           <NavLink
             viewTransition
             to="/alerts"
-            className="w-10 h-10 rounded-full bg-mf-card border border-mf-line flex items-center justify-center text-mf-ink-2 hover:text-mf-ink transition-colors shadow-sm"
+            className="relative w-10 h-10 rounded-full bg-mf-card border border-mf-line flex items-center justify-center text-mf-ink-2 hover:text-mf-ink transition-colors shadow-sm"
           >
             <BellIcon className="scale-90" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-[3px] rounded-full bg-mf-err text-white text-[10px] font-bold leading-4 flex items-center justify-center">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
           </NavLink>
           <NavLink
             viewTransition
@@ -108,6 +116,11 @@ export function Navbar() {
         >
           <div className="relative">
             <BellIcon />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1.5 min-w-[16px] h-4 px-[3px] rounded-full bg-mf-err text-white text-[10px] font-bold leading-4 flex items-center justify-center">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
           </div>
           <span className="text-[11px] tracking-wide">Alerts</span>
         </NavLink>

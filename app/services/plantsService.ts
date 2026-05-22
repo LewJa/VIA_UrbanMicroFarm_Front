@@ -80,3 +80,12 @@ export const removePlant = async (
   return response.data;
 };
 
+export const updatePlantPhoto = async (
+  plantId: number,
+  photo: string,
+): Promise<Plant> => {
+  if (isMockEnabled) return mockPlants.updatePlantPhoto(plantId, photo);
+  const response = await api.put<Plant>(`/api/plants/${plantId}/photo`, { photo });
+  return response.data;
+};
+

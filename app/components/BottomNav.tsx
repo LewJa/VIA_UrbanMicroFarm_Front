@@ -1,85 +1,48 @@
 import { NavLink } from "react-router";
+import { useAlerts } from "~/context/AlertsContext";
 
-const navItems = [
-  {
-    to: "/",
-    label: "Home",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-        <path
-          d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H14v-5H8v5H4a1 1 0 0 1-1-1V9.5z"
-          stroke="currentColor"
-          strokeWidth="1.33"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    to: "/plants",
-    label: "Plants",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-        <path
-          d="M11 19V11"
-          stroke="currentColor"
-          strokeWidth="1.33"
-          strokeLinecap="round"
-        />
-        <path
-          d="M11 11C11 11 6 8.5 6 4.5C6 4.5 8.5 6.5 11 6.5C13.5 6.5 16 4.5 16 4.5C16 8.5 11 11 11 11Z"
-          stroke="currentColor"
-          strokeWidth="1.33"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    to: "/alerts",
-    label: "Alerts",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-        <path
-          d="M11 3a6 6 0 0 1 6 6v3l1.5 2.5h-15L5 12V9a6 6 0 0 1 6-6z"
-          stroke="currentColor"
-          strokeWidth="1.33"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M9 16.5a2 2 0 0 0 4 0"
-          stroke="currentColor"
-          strokeWidth="1.33"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    to: "/account",
-    label: "Account",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-        <circle cx="11" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.33" />
-        <path
-          d="M4 19c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7"
-          stroke="currentColor"
-          strokeWidth="1.33"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-  },
-];
+const HOME_ICON = (
+  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+    <path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H14v-5H8v5H4a1 1 0 0 1-1-1V9.5z" stroke="currentColor" strokeWidth="1.33" strokeLinejoin="round" />
+  </svg>
+);
+
+const PLANTS_ICON = (
+  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+    <path d="M11 19V11" stroke="currentColor" strokeWidth="1.33" strokeLinecap="round" />
+    <path d="M11 11C11 11 6 8.5 6 4.5C6 4.5 8.5 6.5 11 6.5C13.5 6.5 16 4.5 16 4.5C16 8.5 11 11 11 11Z" stroke="currentColor" strokeWidth="1.33" strokeLinejoin="round" />
+  </svg>
+);
+
+const ALERTS_ICON = (
+  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+    <path d="M11 3a6 6 0 0 1 6 6v3l1.5 2.5h-15L5 12V9a6 6 0 0 1 6-6z" stroke="currentColor" strokeWidth="1.33" strokeLinejoin="round" />
+    <path d="M9 16.5a2 2 0 0 0 4 0" stroke="currentColor" strokeWidth="1.33" strokeLinecap="round" />
+  </svg>
+);
+
+const ACCOUNT_ICON = (
+  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+    <circle cx="11" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.33" />
+    <path d="M4 19c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke="currentColor" strokeWidth="1.33" strokeLinecap="round" />
+  </svg>
+);
 
 export default function BottomNav() {
+  const { unreadCount } = useAlerts();
+
   return (
     <div
       className="fixed bottom-0 left-0 right-0 border-t border-mf-line"
       style={{ background: "color-mix(in srgb, var(--color-mf-bg) 86%, transparent)", backdropFilter: "blur(10px)" }}
     >
       <nav className="flex justify-around items-start pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
-        {navItems.map(({ to, label, icon }) => (
+        {[
+          { to: "/", label: "Home", icon: HOME_ICON },
+          { to: "/plants", label: "Plants", icon: PLANTS_ICON },
+          { to: "/alerts", label: "Alerts", icon: ALERTS_ICON, badge: unreadCount },
+          { to: "/account", label: "Account", icon: ACCOUNT_ICON },
+        ].map(({ to, label, icon, badge }) => (
           <NavLink
             key={to}
             to={to}
@@ -90,7 +53,14 @@ export default function BottomNav() {
               }`
             }
           >
-            {icon}
+            <div className="relative">
+              {icon}
+              {badge != null && badge > 0 && (
+                <span className="absolute -top-1 -right-1.5 min-w-[16px] h-4 px-[3px] rounded-full bg-mf-err text-white text-[10px] font-bold leading-4 flex items-center justify-center">
+                  {badge > 99 ? "99+" : badge}
+                </span>
+              )}
+            </div>
             {label}
           </NavLink>
         ))}

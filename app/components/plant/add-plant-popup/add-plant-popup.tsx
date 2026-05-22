@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "~/components/growingSetup/styles/add-growingsetup.css";
 import { growingSetupsService } from "~/services/growingSetupsService";
 import type { MoistureSensor } from "~/model/growingSetup/types";
-import {addPlant} from "~/services/plantsService";
+import { addPlant, getPlantsBySetup } from "~/services/plantsService";
 
 interface AddPlantModalProps {
   isOpen: boolean;
@@ -24,6 +24,7 @@ export function AddPlantModal({
   const [description, setDescription] = useState("");
   const [sensorId, setSensorId] = useState<number | null>(null);
   const [sensorList, setSensorList] = useState<MoistureSensor[]>([]);
+  const [usedSensorIds, setUsedSensorIds] = useState<Set<number>>(new Set());
 
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -31,12 +32,14 @@ export function AddPlantModal({
 
   useEffect(() => {
     const fetchSensors = async () => {
-      const sensors =
-        await growingSetupsService.fetchAllAssignedSensors(setupId);
+      const [sensors, plants] = await Promise.all([
+        growingSetupsService.fetchAllAssignedSensors(setupId),
+        getPlantsBySetup(setupId).catch(() => []),
+      ]);
       setSensorList(sensors);
+      setUsedSensorIds(new Set(plants.map((p) => p.sensorId)));
     };
 
-    // TODO: change
     fetchSensors();
   }, [setupId]);
 
@@ -183,20 +186,30 @@ export function AddPlantModal({
                     {sensorList.length === 0 && (
                         <p className="text-sm text-mf-ink-3">No moisture sensors detected.</p>
                     )}
-                    {sensorList.map((sensor) => (
-                        <button
-                            className={`min-h-[44px] px-3 py-2 rounded transition-colors ${sensorId === sensor.id ? "bg-mf-warn/60" : "bg-mf-warn/15 hover:bg-mf-warn/60"}`}
+                    {sensorList.map((sensor) => {
+                        const taken = usedSensorIds.has(sensor.id);
+                        return (
+                          <button
+                            className={`min-h-[44px] px-3 py-2 rounded transition-colors text-sm font-medium
+                              ${taken
+                                ? "bg-mf-line/30 text-mf-ink-4 cursor-not-allowed line-through"
+                                : sensorId === sensor.id
+                                  ? "bg-mf-warn/60"
+                                  : "bg-mf-warn/15 hover:bg-mf-warn/60"
+                              }`}
                             key={sensor.id}
                             type="button"
+                            disabled={taken}
+                            title={taken ? "Already assigned to a plant" : undefined}
                             onClick={() => {
-                              sensorId != sensor.id
-                                  ? setSensorId(sensor.id)
-                                  : setSensorId(null);
+                              if (taken) return;
+                              setSensorId(sensorId !== sensor.id ? sensor.id : null);
                             }}
-                        >
-                          #{sensor.id}
-                        </button>
-                    ))}
+                          >
+                            #{sensor.id}{taken ? " (used)" : ""}
+                          </button>
+                        );
+                    })}
 
                   </div>
                 </div>

@@ -11,6 +11,7 @@ export interface LoginRequest {
 
 export interface UserProfile {
   id: number;
+  name: string;
   email: string;
   theme: "light" | "dark" | "system";
 }

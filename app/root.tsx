@@ -12,6 +12,8 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import { AuthProvider, useAuth } from "~/context/AuthContext";
+import { AlertsProvider } from "~/context/AlertsContext";
+import AlertToast from "~/components/AlertToast";
 
 const DARK_VARS: Record<string, string> = {
   "--color-mf-bg":       "#1C1B16",
@@ -101,13 +103,16 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <ThemeApplier />
-      <div className="min-h-screen flex flex-col md:block">
-        {!isAuthPage && <Navbar />}
-        <div className={`flex-1 overflow-auto${isAuthPage ? "" : " pb-20 md:pb-0"}`}>
-          <Outlet />
+      <AlertsProvider>
+        <ThemeApplier />
+        <AlertToast />
+        <div className="min-h-screen flex flex-col md:block">
+          {!isAuthPage && <Navbar />}
+          <div className={`flex-1 overflow-auto${isAuthPage ? "" : " pb-20 md:pb-0"}`}>
+            <Outlet />
+          </div>
         </div>
-      </div>
+      </AlertsProvider>
     </AuthProvider>
   );
 }

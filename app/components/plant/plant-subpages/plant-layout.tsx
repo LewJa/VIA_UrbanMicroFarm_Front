@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate, useParams } from "react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { wateringService } from "../../../services/wateringService";
-import { getPlant } from "../../../services/plantsService";
+import { getPlant, updatePlantPhoto } from "../../../services/plantsService";
 import type { Plant } from "../../../model/plant/types";
 import plantImg from "../../../assets/plant.png";
 import "./plant-layout.css";
@@ -21,9 +21,12 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
+  const [isWatering, setIsWatering] = useState(false);
+  const [wateringMessage, setWateringMessage] = useState<{ text: string; ok: boolean } | null>(null);
   const [plant, setPlant] = useState<Plant | null>(null);
   const [plantLoading, setPlantLoading] = useState(true);
   const [plantError, setPlantError] = useState<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setPlantLoading(true);
@@ -43,14 +46,33 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
   }, [plantId]);
 
   const handleManualWatering = async () => {
+    setIsConfirmPopupOpen(false);
+    setIsWatering(true);
+    setWateringMessage(null);
     try {
       await wateringService.triggerManualWatering(Number(plantId));
-      alert("Manual watering triggered successfully!");
-      setIsConfirmPopupOpen(false);
-    } catch (error) {
-      console.error("Failed to trigger manual watering", error);
-      alert("Failed to trigger manual watering.");
+      setWateringMessage({ text: "Watering triggered successfully!", ok: true });
+      setTimeout(() => setWateringMessage(null), 3000);
+    } catch {
+      setWateringMessage({ text: "Failed to trigger manual watering.", ok: false });
+      setTimeout(() => setWateringMessage(null), 3000);
+    } finally {
+      setIsWatering(false);
     }
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      const base64 = evt.target?.result as string;
+      try {
+        const updated = await updatePlantPhoto(Number(plantId), base64);
+        setPlant((prev) => prev ? { ...prev, photo: updated.photo } : prev);
+      } catch {}
+    };
+    reader.readAsDataURL(file);
   };
 
   const tabs = [
@@ -62,6 +84,7 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
   const plantContext: PlantContext = { plant, plantLoading, plantError };
 
   return (
+    <>
     <div className="dashboard-wrapper">
       <div className="dashboard-container">
         <button
@@ -101,22 +124,23 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
         </div>
 
         {isConfirmPopupOpen && (
-          <div className="popup-overlay">
-            <div className="popup-content">
-              <h2>Confirm Watering</h2>
-              <p>Are you sure you want to trigger manual watering?</p>
-              <div className="popup-actions">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-mf-card border border-mf-line rounded-[20px] p-7 w-[90%] max-w-sm text-center shadow-mf-3">
+              <h2 className="font-serif text-[22px] text-mf-ink mb-2">Confirm watering</h2>
+              <p className="text-[14px] text-mf-ink-2 mb-6">Are you sure you want to trigger manual watering for this plant?</p>
+              <div className="flex gap-3 justify-center">
                 <button
-                  className="popup-button cancel"
+                  className="mf-btn mf-btn-secondary"
                   onClick={() => setIsConfirmPopupOpen(false)}
                 >
                   Cancel
                 </button>
                 <button
-                  className="popup-button confirm"
+                  className="mf-btn mf-btn-primary disabled:opacity-50"
                   onClick={handleManualWatering}
+                  disabled={isWatering}
                 >
-                  Confirm
+                  {isWatering ? "Watering…" : "Confirm"}
                 </button>
               </div>
             </div>
@@ -125,9 +149,39 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
 
         <div className="dashboard-content">
           <div className="plant-container">
-            <span className="placeholder-icon">
-              <img src={plantImg} alt="Plant" className="w-full max-w-[300px] h-auto" />
-            </span>
+            <input
+              ref={photoInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handlePhotoUpload}
+            />
+            <button
+              type="button"
+              className="relative group w-full max-w-[260px] aspect-square rounded-2xl overflow-hidden focus:outline-none"
+              onClick={() => photoInputRef.current?.click()}
+              title="Upload plant photo"
+            >
+              {plant?.photo ? (
+                <>
+                  <img src={plant.photo} alt={plant.name} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-hover:opacity-100 transition-opacity drop-shadow">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+                    </svg>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <img src={plantImg} alt="Plant" className="w-full h-full object-contain p-4" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end justify-center pb-4">
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[11px] font-bold uppercase tracking-wide text-mf-ink bg-mf-card/80 px-3 py-1 rounded-full">
+                      Upload photo
+                    </span>
+                  </div>
+                </>
+              )}
+            </button>
             <p id="plant-species">{plant?.type ?? "Plant species"}</p>
           </div>
           <div className="data-container">
@@ -161,5 +215,12 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
         </div>
       </div>
     </div>
+
+    {wateringMessage && (
+      <div className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-medium shadow-mf-2 z-50 ${wateringMessage.ok ? "bg-mf-forest text-[#F4EEDB]" : "bg-mf-err text-[#F4EEDB]"}`}>
+        {wateringMessage.text}
+      </div>
+    )}
+    </>
   );
 }

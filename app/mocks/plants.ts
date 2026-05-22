@@ -30,4 +30,9 @@ export const mockPlants = {
   removePlant: async (_plantId: number): Promise<{ message: string }> => ({
     message: "Plant removed successfully",
   }),
+
+  updatePlantPhoto: async (plantId: number, photo: string): Promise<Plant> => {
+    const plant = PLANTS.find((p) => p.id === plantId) ?? PLANTS[0];
+    return { ...plant, photo };
+  },
 };
