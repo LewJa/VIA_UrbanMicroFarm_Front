@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate, useParams } from "react-router";
 import { useState, useEffect, useRef } from "react";
 import { wateringService } from "../../../services/wateringService";
 import { getPlant, updatePlantPhoto } from "../../../services/plantsService";
-import type { Plant } from "../../../model/plant/types";
+import type { Plant } from "~/model/plant/types";
 import plantImg from "../../../assets/plant.png";
 import {ArrowLeftIcon} from "~/components/icons/icons-specific/ArrowLeftIcon";
 import {Camera} from "~/components/icons/icons-specific/Camera";
@@ -48,7 +48,9 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
     const load = async () => {
       try {
         const data = await getPlant(Number(plantId));
+        console.log(data);
         setPlant(data);
+        console.log(data.id, data.name, "health:", data.health, "→ status:", currentStatus)
         const last = await wateringService.getLastWateringEvent(data.id);
         setLastWatering(last.createdAt);
       } catch (err: unknown) {
@@ -57,9 +59,11 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
       } finally {
         setPlantLoading(false);
       }
+
     };
 
     load();
+
   }, [plantId]);
 
   const handleManualWatering = async () => {
@@ -123,6 +127,7 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
 
   const plantContext: PlantContext = { plant, plantLoading, plantError };
   const title = splitTitle(plant?.name ?? `Plant ${plantId}`);
+  const currentStatus = plant?.health ?? "unknown";
 
   return (
     <>
@@ -194,7 +199,6 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
               </em>
             </h1>
 
-            {/* Status chips */}
             <div className="flex flex-wrap gap-2 mt-4">
               {plantLoading ? (
                   <span className="mf-chip">
@@ -208,14 +212,25 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
                 </span>
               ) : (
                   <>
-                  <span className="mf-chip mf-chip-ok">
-                    <span className="mf-chip-dot" />
-                    thriving
-                  </span>
+                    {currentStatus === "stressed" ? (
+                        <div className="mf-chip mf-chip-warn px-2.5 py-1.5 h-auto">
+                          <div className="mf-chip-dot"></div>
+                          <span className="text-[12px] font-bold tracking-wide pl-1">needs water</span>
+                        </div>
+                    ) : currentStatus === "unknown" ? (
+                        <div className="mf-chip px-2.5 py-1.5 h-auto bg-mf-line/30 text-mf-ink-4">
+                          <span className="text-[12px] font-bold tracking-wide">no data</span>
+                        </div>
+                    ) : (
+                        <div className="mf-chip mf-chip-ok px-2.5 py-1.5 h-auto">
+                          <div className="mf-chip-dot"></div>
+                          <span className="text-[12px] font-bold tracking-wide pl-1">ok</span>
+                        </div>
+                    )}
                     <span className="mf-chip">
-                    <DropIcon />
-                      {formatLastWatered(lastWatering)}
-                  </span>
+                        <DropIcon />
+                        {formatLastWatered(lastWatering)}
+                    </span>
                   </>
               )}
             </div>
@@ -283,7 +298,6 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
           ))}
         </div>
 
-        {/* ── Tab content ──────────────────────────────────────── */}
         <section className="mt-6">
           <Outlet context={plantContext} />
         </section>
@@ -330,31 +344,6 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
               </div>
             </div>
         )}
-
-        {/*{isConfirmPopupOpen && (*/}
-        {/*  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">*/}
-        {/*    <div className="bg-mf-card border border-mf-line rounded-[20px] p-7 w-[90%] max-w-sm text-center shadow-mf-3">*/}
-        {/*      <h2 className="font-serif text-[22px] text-mf-ink mb-2">Confirm watering</h2>*/}
-        {/*      <p className="text-[14px] text-mf-ink-2 mb-6">Are you sure you want to trigger manual watering for this plant?</p>*/}
-        {/*      <div className="flex gap-3 justify-center">*/}
-        {/*        <button*/}
-        {/*          className="mf-btn mf-btn-secondary"*/}
-        {/*          onClick={() => setIsConfirmPopupOpen(false)}*/}
-        {/*        >*/}
-        {/*          Cancel*/}
-        {/*        </button>*/}
-        {/*        <button*/}
-        {/*          className="mf-btn mf-btn-primary disabled:opacity-50"*/}
-        {/*          onClick={handleManualWatering}*/}
-        {/*          disabled={isWatering}*/}
-        {/*        >*/}
-        {/*          {isWatering ? "Watering…" : "Confirm"}*/}
-        {/*        </button>*/}
-        {/*      </div>*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*)}*/}
-
 
       </div>
     </div>

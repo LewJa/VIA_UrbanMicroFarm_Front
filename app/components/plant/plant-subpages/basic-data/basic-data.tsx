@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useOutletContext } from "react-router";
-import { sensorService } from "../../../../services/sensorService";
+import { sensorService} from "~/services/sensorService";
 import { growingSetupsService } from "~/services/growingSetupsService";
-import type { SensorReading } from "../../../../model/sensor/types";
+import type { SensorReading} from "~/model/sensor/types";
 import type { SetupReading } from "~/model/growingSetup/types";
-import type { PlantContext } from "../plant-layout";
+import type { PlantContext} from "~/components/plant/plant-subpages/plant-layout";
 import { DropIcon } from "~/components/icons/icons-specific/Drop";
 import { TagIcon } from "~/components/icons/icons-specific/TagIcon";
 import { ClockIcon } from "~/components/icons/icons-specific/ClockIcon";

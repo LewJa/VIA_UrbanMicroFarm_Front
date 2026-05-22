@@ -7,7 +7,7 @@ export interface Plant {
   datePlanted: string;
   status: string;
   photo?: string;
-  health?: "ok" | "water" | "unknown";
+  health?: "healthy" | "stressed" | "unknown";
 }
 
 export interface SensorHistoricalReading {
