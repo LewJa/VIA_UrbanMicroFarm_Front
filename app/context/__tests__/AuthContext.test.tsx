@@ -10,7 +10,7 @@ function TestConsumer() {
       <span data-testid="name">{user?.name ?? "null"}</span>
       <span data-testid="email">{user?.email ?? "null"}</span>
       <span data-testid="theme">{user?.theme ?? "null"}</span>
-      <button onClick={() => login("test-token", { id: 1, email: "a@b.com", theme: "light" })}>
+      <button onClick={() => login("test-token", { id: 1, email: "a@b.com", name: "Alex", theme: "light" })}>
         do-login
       </button>
       <button onClick={logout}>do-logout</button>
