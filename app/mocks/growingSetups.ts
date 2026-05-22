@@ -9,13 +9,13 @@ const SETUP_READINGS: Record<number, Omit<SetupReading, "setupId">> = {
 };
 
 const SENSORS: Sensor[] = [
-  { id: 101, type: "SOIL_MOISTURE", status: "Active" },
-  { id: 102, type: "TEMPERATURE", status: "Inactive" },
+  { id: 101, sensorType: "SOIL_MOISTURE", status: "Active" },
+  { id: 102, sensorType: "TEMPERATURE", status: "Inactive" },
 ];
 
 export const mockGrowingSetups = {
-  assignSetupToUser: async (_userId: number, setupId: number): Promise<{ growingSetup: GrowingSetup }> => ({
-    growingSetup: GROWING_SETUPS.find((s) => s.id === setupId) ?? { id: setupId, location: "Default", status: "Active" },
+  assignSetupToUser: async (_userId: number, serialNumber: string): Promise<{ growingSetup: GrowingSetup }> => ({
+    growingSetup: GROWING_SETUPS.find((s) => s.id === 1) ?? { id: 1, location: "Default", status: "Active" },
   }),
 
   updateSetupLocation: async (setupId: number, location: string): Promise<{ growingSetup: GrowingSetup }> => {

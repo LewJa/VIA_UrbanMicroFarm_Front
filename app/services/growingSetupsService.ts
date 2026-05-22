@@ -4,9 +4,9 @@ import { isMockEnabled } from "~/mocks";
 import { mockGrowingSetups } from "~/mocks/growingSetups";
 
 export const growingSetupsService = {
-  assignSetupToUser: async (userId: number, setupId: number): Promise<{ growingSetup: GrowingSetup }> => {
-    if (isMockEnabled) return mockGrowingSetups.assignSetupToUser(userId, setupId);
-    const response = await api.post<{ growingSetup: GrowingSetup }>("/api/growingsetups", { userId, setupId });
+  assignSetupToUser: async (userId: number, serialNumber: string): Promise<{ growingSetup: GrowingSetup }> => {
+    if (isMockEnabled) return mockGrowingSetups.assignSetupToUser(userId, serialNumber);
+    const response = await api.post<{ growingSetup: GrowingSetup }>("/api/growingsetups", { userId, serialNumber });
     return response.data;
   },
 
