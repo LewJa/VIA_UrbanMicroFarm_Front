@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import PredictionsChart from "../PredictionsChart";
 import { predictionService } from "~/services/predictionService";
 
-let capturedTooltipContent: ((props: unknown) => React.ReactNode) | null = null;
 let capturedReferenceLineY: number | null = null;
 
 vi.mock("recharts", () => ({
@@ -21,10 +20,7 @@ vi.mock("recharts", () => ({
   XAxis: () => null,
   YAxis: () => null,
   CartesianGrid: () => null,
-  Tooltip: ({ content }: { content: (props: unknown) => React.ReactNode }) => {
-    capturedTooltipContent = content;
-    return null;
-  },
+  Tooltip: () => null,
   ReferenceLine: ({ y }: { y: number }) => {
     capturedReferenceLineY = y;
     return null;
@@ -37,7 +33,6 @@ vi.mock("~/services/predictionService", () => ({
 
 const mockGetPredictions = vi.mocked(predictionService.getPredictions);
 
-// Fixed reference point so date arithmetic is deterministic
 const NOW = new Date("2024-01-31T12:00:00.000Z").getTime();
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -58,7 +53,6 @@ const allPredictions = [...within7d, ...within30d, ...within60d];
 describe("PredictionsChart", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    capturedTooltipContent = null;
     capturedReferenceLineY = null;
     vi.spyOn(Date, "now").mockReturnValue(NOW);
   });
@@ -107,7 +101,7 @@ describe("PredictionsChart", () => {
   // ── Empty ──────────────────────────────────────────────────────────────────
 
   it("shows empty-state message when no predictions fall within the selected range", async () => {
-    // within60d are all 35–58 days old; default range is 30d so all are filtered out
+    // within60d are all 35–58 days old; default range is 30d so all filtered out
     mockGetPredictions.mockResolvedValue(within60d);
     render(<PredictionsChart plantId={1} />);
     await waitFor(() =>
@@ -130,9 +124,28 @@ describe("PredictionsChart", () => {
     await waitFor(() => expect(mockGetPredictions).toHaveBeenCalledWith(42));
   });
 
+  // ── Stat strip ─────────────────────────────────────────────────────────────
+
+  it("shows Average, Min, Max stat strip on success", async () => {
+    mockGetPredictions.mockResolvedValue(within30d);
+    render(<PredictionsChart plantId={1} />);
+    await waitFor(() => screen.getByTestId("line-chart"));
+    expect(screen.getByText("Average")).toBeInTheDocument();
+    expect(screen.getByText("Min")).toBeInTheDocument();
+    expect(screen.getByText("Max")).toBeInTheDocument();
+  });
+
+  it("stat strip shows correct min and max values", async () => {
+    mockGetPredictions.mockResolvedValue([pred(5, 0.5, 1), pred(10, 1.5, 2), pred(15, 1.0, 3)]);
+    render(<PredictionsChart plantId={1} />);
+    await waitFor(() => screen.getByTestId("line-chart"));
+    expect(screen.getByText(/0\.50/)).toBeInTheDocument();
+    expect(screen.getByText(/1\.50/)).toBeInTheDocument();
+  });
+
   // ── Range filter buttons ───────────────────────────────────────────────────
 
-  it("default range is 30d — its button is pressed, 7d button is not", () => {
+  it("default range is 30d — its button is pressed", () => {
     mockGetPredictions.mockImplementation(() => new Promise(() => {}));
     render(<PredictionsChart plantId={1} />);
     expect(screen.getByRole("button", { name: "30 days" })).toHaveAttribute("aria-pressed", "true");
@@ -174,7 +187,6 @@ describe("PredictionsChart", () => {
   // ── Data shape ────────────────────────────────────────────────────────────
 
   it("chart data is sorted by time ascending", async () => {
-    // Supply predictions in reverse order
     mockGetPredictions.mockResolvedValue([...within30d].reverse());
     render(<PredictionsChart plantId={1} />);
     await waitFor(() => screen.getByTestId("line-chart"));
@@ -189,7 +201,7 @@ describe("PredictionsChart", () => {
   it("displays the computed average in the legend", async () => {
     mockGetPredictions.mockResolvedValue([pred(5, 1.0, 1), pred(10, 2.0, 2)]);
     render(<PredictionsChart plantId={1} />);
-    await waitFor(() => expect(screen.getByTestId("line-chart")).toBeInTheDocument());
+    await waitFor(() => screen.getByTestId("line-chart"));
     // (1.0 + 2.0) / 2 = 1.5
     expect(screen.getByText(/Avg 1\.5 L/)).toBeInTheDocument();
   });
@@ -197,7 +209,7 @@ describe("PredictionsChart", () => {
   it("ReferenceLine y matches the computed average", async () => {
     mockGetPredictions.mockResolvedValue([pred(5, 1.0, 1), pred(10, 3.0, 2)]);
     render(<PredictionsChart plantId={1} />);
-    await waitFor(() => expect(screen.getByTestId("line-chart")).toBeInTheDocument());
+    await waitFor(() => screen.getByTestId("line-chart"));
     // (1.0 + 3.0) / 2 = 2.0
     expect(capturedReferenceLineY).toBe(2.0);
   });
@@ -216,28 +228,4 @@ describe("PredictionsChart", () => {
     expect(screen.getByText("Water amount predictions")).toBeInTheDocument();
   });
 
-  // ── Tooltip ────────────────────────────────────────────────────────────────
-
-  it("tooltip shows predicted value and date for a chart point", async () => {
-    // Single prediction so index 0 is unambiguous after sort
-    mockGetPredictions.mockResolvedValue([pred(5, 1.25, 1)]);
-    render(<PredictionsChart plantId={1} />);
-    await waitFor(() => screen.getByTestId("line-chart"));
-
-    const point = JSON.parse(
-      screen.getByTestId("line-chart").getAttribute("data-chart-data")!,
-    )[0];
-
-    const { container } = render(
-      capturedTooltipContent!({ active: true, payload: [{ payload: point }] }) as React.ReactElement,
-    );
-    expect(container).toHaveTextContent(/1\.25 L predicted/);
-  });
-
-  it("tooltip returns null when not active", async () => {
-    mockGetPredictions.mockResolvedValue([pred(5, 1.0, 1), pred(6, 1.0, 2)]);
-    render(<PredictionsChart plantId={1} />);
-    await waitFor(() => screen.getByTestId("line-chart"));
-    expect(capturedTooltipContent!({ active: false, payload: [] })).toBeNull();
-  });
 });

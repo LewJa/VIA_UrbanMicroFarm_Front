@@ -28,7 +28,7 @@ const mockPlant = {
   type: "Herb",
   description: "Sweet basil",
   datePlanted: "2024-03-01",
-  status: "Healthy" as const,
+  status: "growing" as const,
 };
 
 describe("Predictions", () => {
@@ -63,5 +63,21 @@ describe("Predictions", () => {
     mockUseOutletContext.mockReturnValue({ plant: null, plantLoading: false, plantError: null });
     const { container } = render(<Predictions />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("does not render chart while loading", () => {
+    mockUseOutletContext.mockReturnValue({ plant: mockPlant, plantLoading: true, plantError: null });
+    render(<Predictions />);
+    expect(screen.queryByTestId("predictions-chart")).not.toBeInTheDocument();
+  });
+
+  it("does not render chart when there is an error", () => {
+    mockUseOutletContext.mockReturnValue({
+      plant: mockPlant,
+      plantLoading: false,
+      plantError: "Something went wrong",
+    });
+    render(<Predictions />);
+    expect(screen.queryByTestId("predictions-chart")).not.toBeInTheDocument();
   });
 });

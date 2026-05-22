@@ -2,7 +2,6 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import HistoricalData from "../historical-data";
 
-// Stub SoilMoistureHistoryChart so we can inspect the props it receives
 vi.mock("../SoilMoistureHistoryChart", () => ({
   default: ({
     sensorId,
@@ -22,7 +21,6 @@ vi.mock("../SoilMoistureHistoryChart", () => ({
   ),
 }));
 
-// Mock useOutletContext and useParams so we control what the parent provides
 vi.mock("react-router", async () => {
   const actual = await vi.importActual<typeof import("react-router")>("react-router");
   return { ...actual, useOutletContext: vi.fn(), useParams: vi.fn() };
@@ -81,7 +79,6 @@ describe("HistoricalData", () => {
     });
     render(<HistoricalData />);
     const chart = screen.getByTestId("chart");
-    // sensorId=42, NOT plant.id=7 — a regression to parseInt(plantId) would fail this
     expect(chart).toHaveAttribute("data-sensor-id", "42");
   });
 
@@ -92,10 +89,7 @@ describe("HistoricalData", () => {
       plantError: null,
     });
     render(<HistoricalData />);
-    expect(screen.getByTestId("chart")).not.toHaveAttribute(
-      "data-sensor-id",
-      "7",
-    );
+    expect(screen.getByTestId("chart")).not.toHaveAttribute("data-sensor-id", "7");
   });
 
   it("passes plant.name as plantName to the chart", () => {
@@ -105,10 +99,7 @@ describe("HistoricalData", () => {
       plantError: null,
     });
     render(<HistoricalData />);
-    expect(screen.getByTestId("chart")).toHaveAttribute(
-      "data-plant-name",
-      "Basil",
-    );
+    expect(screen.getByTestId("chart")).toHaveAttribute("data-plant-name", "Basil");
   });
 
   it("renders nothing when plant is null and not loading", () => {
@@ -121,7 +112,6 @@ describe("HistoricalData", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  // C-12
   it("passes setupId from URL params to the chart as a number", () => {
     mockUseParams.mockReturnValue({ setupId: "5", sensorId: "101", plantId: "1" });
     mockUseOutletContext.mockReturnValue({ plant: basePlant, plantLoading: false, plantError: null });
@@ -129,7 +119,6 @@ describe("HistoricalData", () => {
     expect(screen.getByTestId("chart")).toHaveAttribute("data-setup-id", "5");
   });
 
-  // C-12b
   it("passes undefined setupId to chart when setupId param is absent from URL", () => {
     mockUseParams.mockReturnValue({ sensorId: "101", plantId: "1" });
     mockUseOutletContext.mockReturnValue({ plant: basePlant, plantLoading: false, plantError: null });
