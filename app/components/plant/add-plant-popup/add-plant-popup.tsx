@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "~/components/growingSetup/styles/add-growingsetup.css";
 import { growingSetupsService } from "~/services/growingSetupsService";
-import type { MoistureSensor } from "~/model/growingSetup/types";
+import type {MoistureSensor, Sensor} from "~/model/growingSetup/types";
 import { addPlant, getPlantsBySetup } from "~/services/plantsService";
 
 interface AddPlantModalProps {
@@ -33,10 +33,11 @@ export function AddPlantModal({
   useEffect(() => {
     const fetchSensors = async () => {
       const [sensors, plants] = await Promise.all([
+
         growingSetupsService.fetchAllAssignedSensors(setupId),
         getPlantsBySetup(setupId).catch(() => []),
       ]);
-      setSensorList(sensors);
+      setSensorList(sensors.filter((s: Sensor) => s.type === "soil_moisture"));
       setUsedSensorIds(new Set(plants.map((p) => p.sensorId)));
     };
 

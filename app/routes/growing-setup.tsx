@@ -4,7 +4,7 @@ import { growingSetupsService } from "~/services/growingSetupsService";
 import { getPlantsBySetup, updatePlantPhoto } from "~/services/plantsService";
 import { AddPlantModal } from "~/components/plant/add-plant-popup/add-plant-popup";
 import { wateringService } from "~/services/wateringService";
-import type { GrowingSetup, SetupReading, MoistureSensor } from "~/model/growingSetup/types";
+import type {GrowingSetup, SetupReading, MoistureSensor, Sensor} from "~/model/growingSetup/types";
 import type { Plant } from "~/model/plant/types";
 import { useAuth } from "~/context/AuthContext";
 
@@ -28,7 +28,8 @@ export default function GrowingSetupPage() {
 
     const [setup, setSetup] = useState<GrowingSetup | null>(null);
     const [reading, setReading] = useState<SetupReading | null>(null);
-    const [sensors, setSensors] = useState<MoistureSensor[]>([]);
+    const [sensors, setSensors] = useState<Sensor[]>([]);
+    const [moistureSensors, setMoistureSensors] = useState<MoistureSensor[]>([]);
     const [plants, setPlants] = useState<Plant[]>([]);
     const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
     const [errorMessage, setErrorMessage] = useState("");
@@ -68,7 +69,8 @@ export default function GrowingSetupPage() {
             .then(([readingData, sensorData, plantData, setupData]) => {
                 if (!alive) return;
                 setReading(readingData);
-                setSensors(sensorData);
+                setSensors(sensorData.filter((s: Sensor) => s.type !== "soil_moisture"));
+                setMoistureSensors(sensorData.filter((s: Sensor) => s.type === "soil_moisture"));
                 setPlants(plantData);
                 setSetup(setupData);
                 setPageStatus("success");
@@ -172,6 +174,12 @@ export default function GrowingSetupPage() {
 
     return (
         <div className="px-4 sm:px-6 xl:px-12 w-full max-w-150 lg:max-w-full lg:mx-auto">
+            {sensors.length === 0 && moistureSensors.length === 0 && (
+                <div className="mb-6 p-4 rounded-2xl border border-dashed border-mf-err/30 bg-mf-err/10">
+                    <p className="text-sm font-medium text-mf-err">No sensors found for this setup. Connect a sensor to start collecting data.</p>
+                </div>
+            )}
+
             <button
                 onClick={() => navigate("/")}
                 className="flex items-center gap-1.5 mb-5 text-[13px] font-medium text-mf-ink-3 hover:text-mf-ink transition-colors"

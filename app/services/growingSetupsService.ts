@@ -1,5 +1,5 @@
 import api from "../api/client";
-import type { GrowingSetup, SetupReading, MoistureSensor } from "../model/growingSetup/types";
+import type {GrowingSetup, SetupReading, MoistureSensor, Sensor} from "../model/growingSetup/types";
 import { isMockEnabled } from "~/mocks";
 import { mockGrowingSetups } from "~/mocks/growingSetups";
 
@@ -34,9 +34,9 @@ export const growingSetupsService = {
     return response.data;
   },
 
-  fetchAllAssignedSensors: async (setupId: number): Promise<MoistureSensor[]> => {
+  fetchAllAssignedSensors: async (setupId: number): Promise<Sensor[]> => {
     if (isMockEnabled) return mockGrowingSetups.fetchAllAssignedSensors(setupId);
-    const response = await api.get<MoistureSensor[]>(`/api/growingsetups/${setupId}/sensors`);
+    const response = await api.get<Sensor[]>(`/api/growingsetups/${setupId}/sensors`);
     return response.data;
   },
 

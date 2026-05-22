@@ -1,4 +1,4 @@
-import type { GrowingSetup, SetupReading, MoistureSensor } from "~/model/growingSetup/types";
+import type {GrowingSetup, SetupReading, MoistureSensor, Sensor} from "~/model/growingSetup/types";
 
 const GROWING_SETUPS: GrowingSetup[] = [
   { id: 1, location: "Balcony", status: "Active" },
@@ -8,9 +8,9 @@ const SETUP_READINGS: Record<number, Omit<SetupReading, "setupId">> = {
   1: { timestamp: new Date().toISOString(), temperature: 24.5, humidity: 45, light: 850 },
 };
 
-const SENSORS: MoistureSensor[] = [
-  { id: 101, status: "Active" },
-  { id: 102, status: "Inactive" },
+const SENSORS: Sensor[] = [
+  { id: 101, type: "SOIL_MOISTURE", status: "Active" },
+  { id: 102, type: "TEMPERATURE", status: "Inactive" },
 ];
 
 export const mockGrowingSetups = {
@@ -34,5 +34,5 @@ export const mockGrowingSetups = {
     return { setupId, ...reading } as SetupReading;
   },
 
-  fetchAllAssignedSensors: async (_setupId: number): Promise<MoistureSensor[]> => SENSORS,
+  fetchAllAssignedSensors: async (_setupId: number): Promise<Sensor[]> => SENSORS,
 };
