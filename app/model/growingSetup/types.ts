@@ -28,6 +28,6 @@ export interface MoistureSensor {
 
 export interface Sensor {
   id: number;
-  type: string;
+  sensorType: string;
   status: string;
 }

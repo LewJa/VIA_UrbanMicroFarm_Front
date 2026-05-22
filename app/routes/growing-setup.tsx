@@ -12,6 +12,7 @@ import { ThermometerIcon } from "~/components/icons/icons-specific/Thermometer";
 import { DropIcon } from "~/components/icons/icons-specific/Drop";
 import { SunIcon } from "~/components/icons/icons-specific/Sun";
 import { MoreDotsIcon } from "~/components/icons/icons-specific/MoreDots";
+import {sensorService} from "~/services/sensorService";
 
 type PageStatus = "loading" | "error" | "success";
 
@@ -52,13 +53,14 @@ export default function GrowingSetupPage() {
         const userId = user?.id;
 
         const setupFetch: Promise<GrowingSetup> = navLocation
-            ? Promise.resolve({ id, location: navLocation, status: navStatus ?? "", sensorSlots: 4 } as GrowingSetup)
+            ? Promise.resolve({ id, location: navLocation, status: navStatus ?? "", sensorSlots: 0 } as GrowingSetup)
             : growingSetupsService
                 .getSetupById(id, userId!)
-                .then((s) => s ?? { id, location: `Setup #${id}`, status: "", sensorSlots: 4 } as GrowingSetup);
+                .then((s) => s ?? { id, location: `Setup #${id}`, status: "", sensorSlots: 0 } as GrowingSetup);
 
         const readingsFetch = growingSetupsService.getSetupSensorReadings(id).catch(() => null);
         const sensorsFetch = growingSetupsService.fetchAllAssignedSensors(id).catch(() => []);
+        console.log(sensorsFetch);
 
         Promise.all([
             readingsFetch,
@@ -69,10 +71,10 @@ export default function GrowingSetupPage() {
             .then(([readingData, sensorData, plantData, setupData]) => {
                 if (!alive) return;
                 setReading(readingData);
-                setSensors(sensorData.filter((s: Sensor) => s.type !== "soil_moisture"));
-                setMoistureSensors(sensorData.filter((s: Sensor) => s.type === "soil_moisture"));
+                setSensors(sensorData.filter((s) => s.sensorType !== "Soil_Moisture"));
+                setMoistureSensors(sensorData.filter((s) => s.sensorType === "Soil_Moisture"));
                 setPlants(plantData);
-                setSetup(setupData);
+                setSetup({id: setupData.id, location: setupData.location, status: setupData.status, sensorSlots: moistureSensors.length});
                 setPageStatus("success");
             })
             .catch((err: any) => {
@@ -85,6 +87,8 @@ export default function GrowingSetupPage() {
                 }
                 setPageStatus("error");
             });
+
+        console.log(sensors)
 
         return () => {
             alive = false;
@@ -384,7 +388,7 @@ export default function GrowingSetupPage() {
                                     <div key={sensor.id} className="mf-card p-4 flex items-center justify-between">
                                         <div className="flex flex-col gap-0.5">
                                             <span className="text-[14px] font-medium text-mf-ink">Sensor #{sensor.id}</span>
-                                            <span className="text-[11px] uppercase tracking-widest text-mf-ink-4 font-semibold">Slot {i + 1}</span>
+                                            <span className="text-[11px] uppercase tracking-widest text-mf-ink-4 font-semibold">Type: {sensor.sensorType}</span>
                                         </div>
                                         {sensor.status === "Active" ? (
                                             <div className="mf-chip mf-chip-ok px-2.5 py-1.5 h-auto">
