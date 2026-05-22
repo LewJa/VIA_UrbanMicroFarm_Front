@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useOutletContext } from "react-router";
-import { sensorService } from "../../../../services/sensorService";
-import type { SensorReading } from "../../../../model/sensor/types";
-import type { PlantContext } from "../plant-layout";
+import { sensorService } from "~/services/sensorService";
+import type { SensorReading } from "~/model/sensor/types";
+import type { PlantContext } from "./plant-layout";
 import "./basic-data.css";
 
 export default function BasicData() {
@@ -19,11 +19,11 @@ export default function BasicData() {
 
     setLoading(true);
     sensorService.getLatestReading(sensorIdNumber)
-      .then((data) => {
+      .then((data: SensorReading) => {
         setReading(data);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.error("Failed to fetch sensor reading:", err);
         setError("Failed to load latest sensor data.");
         setLoading(false);

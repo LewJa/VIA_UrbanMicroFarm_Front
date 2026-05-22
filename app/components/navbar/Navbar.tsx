@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import { useAlerts } from "~/context/AlertsContext";
 
 const SproutIcon = () => (
   <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -37,10 +38,12 @@ const UserIcon = () => (
 );
 
 export function Navbar() {
+  const { unreadCount } = useAlerts();
+
   return (
     <>
       <header className="flex justify-between items-center px-4 py-4 md:px-8 md:py-6 relative z-10">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-3 md:gap-8">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 flex items-center justify-center">
               <SproutIcon />
@@ -49,21 +52,24 @@ export function Navbar() {
           </div>
 
           <nav className="hidden md:flex items-center gap-2">
-            <NavLink 
-              to="/" 
-              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-[#304a2a] font-bold" : "text-[#7a7767] hover:text-[#304a2a] font-medium"}`}
+            <NavLink
+              viewTransition
+              to="/"
+              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
               Home
             </NavLink>
-            <NavLink 
-              to="/alerts" 
-              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-[#304a2a] font-bold" : "text-[#7a7767] hover:text-[#304a2a] font-medium"}`}
+            <NavLink
+              viewTransition
+              to="/alerts"
+              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
               Alerts
             </NavLink>
-            <NavLink 
-              to="/account" 
-              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-[#304a2a] font-bold" : "text-[#7a7767] hover:text-[#304a2a] font-medium"}`}
+            <NavLink
+              viewTransition
+              to="/account"
+              className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
               Account
             </NavLink>
@@ -72,12 +78,19 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <NavLink
-            to="/alerts" 
-            className="w-10 h-10 rounded-full bg-mf-card border border-mf-line flex items-center justify-center text-mf-ink-2 hover:text-mf-ink transition-colors shadow-sm"
+            viewTransition
+            to="/alerts"
+            className="relative w-10 h-10 rounded-full bg-mf-card border border-mf-line flex items-center justify-center text-mf-ink-2 hover:text-mf-ink transition-colors shadow-sm"
           >
             <BellIcon className="scale-90" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-[3px] rounded-full bg-mf-err text-white text-[10px] font-bold leading-4 flex items-center justify-center">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
           </NavLink>
-          <NavLink 
+          <NavLink
+            viewTransition
             to="/account"
             className="hidden md:flex w-9 h-9 rounded-full bg-mf-clay text-mf-cream items-center justify-center text-sm font-medium shadow-sm hover:opacity-90 transition-opacity"
           >
@@ -87,26 +100,34 @@ export function Navbar() {
       </header>
 
       {/* Mobile Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#FAF6EE] border-t border-mf-line flex justify-around items-center pt-3 pb-7">
-        <NavLink 
-          to="/" 
-          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-[#304a2a] font-bold" : "text-[#7a7767] font-medium"}`}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-mf-bg border-t border-mf-line flex justify-around items-center pt-3 pb-7">
+        <NavLink
+          viewTransition
+          to="/"
+          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >
           <HomeIcon />
           <span className="text-[11px] tracking-wide">Home</span>
         </NavLink>
-        <NavLink 
-          to="/alerts" 
-          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-[#304a2a] font-bold" : "text-[#7a7767] font-medium"}`}
+        <NavLink
+          viewTransition
+          to="/alerts"
+          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >
           <div className="relative">
             <BellIcon />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1.5 min-w-[16px] h-4 px-[3px] rounded-full bg-mf-err text-white text-[10px] font-bold leading-4 flex items-center justify-center">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
           </div>
           <span className="text-[11px] tracking-wide">Alerts</span>
         </NavLink>
-        <NavLink 
-          to="/account" 
-          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-[#304a2a] font-bold" : "text-[#7a7767] font-medium"}`}
+        <NavLink
+          viewTransition
+          to="/account"
+          className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >
           <UserIcon />
           <span className="text-[11px] tracking-wide">Account</span>

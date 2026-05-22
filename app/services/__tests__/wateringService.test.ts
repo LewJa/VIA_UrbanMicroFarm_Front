@@ -6,7 +6,7 @@ const MOCK_EVENTS: WateringEvent[] = vi.hoisted(() => []);
 vi.mock("~/mocks/wateringEvents", () => ({ MOCK_WATERING_EVENTS: MOCK_EVENTS }));
 vi.mock("~/api/client", () => ({ default: { get: vi.fn() } }));
 // Force isMockEnabled=false so the flag-on path reaches api.get regardless of .env.local
-vi.mock("~/services/mockService", () => ({ isMockEnabled: false, MockService: {} }));
+vi.mock("~/mocks/index", () => ({ isMockEnabled: false }));
 
 import api from "~/api/client";
 import { wateringService } from "~/services/wateringService";

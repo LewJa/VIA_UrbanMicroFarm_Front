@@ -8,6 +8,7 @@ vi.mock("../basic-data.css", () => ({}));
 vi.mock("react-router", () => ({
   useParams: () => ({
     plantId: "1",
+    sensorId: "7",
   }),
 }));
 

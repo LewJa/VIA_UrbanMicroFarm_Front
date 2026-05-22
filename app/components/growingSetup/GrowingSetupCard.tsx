@@ -1,4 +1,4 @@
-﻿import type {SetupReading} from "~/model/growingSetup/types";
+import type {SetupReading} from "~/model/growingSetup/types";
 import type {Plant} from "~/model/plant/types";
 import {useEffect, useState} from "react";
 import {growingSetupsService} from "~/services/growingSetupsService";
@@ -34,7 +34,7 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
                     getPlantsBySetup(setupId).catch(() => []),
                     growingSetupsService.fetchAllAssignedSensors(setupId).catch(() => [])
                 ]);
-                
+
                 if (!cancelled) {
                     setSetupReadings(readings);
                     setPlants(fetchedPlants);
@@ -56,29 +56,18 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
 
     }, [setupId]);
 
-    const sensorLabel = sensors.length > 0 ? `sensor #${sensors[0].id}` : "no sensors";
     const plantCount = plants.length;
     const plantLabel = plantCount === 1 ? "1 plant" : `${plantCount} plants`;
 
-    const slots = Array.from({ length: Math.max(sensors.length, 1) }, (_, index) =>  {
-        const plant = plants[index];
-        if (plant) {
-            return (
-                <div key={plant.id || index} className="mf-photo mf-photo-leaf h-32 relative rounded-mf-md">
-                    <span className="opacity-70">{plant.name || plant.type}</span>
-                </div>
-            );
-        }
-        return (
-            <div key={`empty-${index}`} className="w-full min-h-20 relative overflow-hidden flex items-center justify-center
-    font-mono text-[11px] uppercase tracking-[.04em] rounded-mf-md border border-dashed border-[#d9cfb8] bg-[#f4eedb]/30 text-[#d9cfb8]">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-            </div>
-        );
-    });
+    const slots = plants.map((plant, index) => (
+        <div key={plant.id || index} className="mf-photo mf-photo-leaf h-24 sm:h-32 relative rounded-mf-md">
+            {plant.photo ? (
+                <img src={plant.photo} alt={plant.name} className="w-full h-full object-cover rounded-mf-md" />
+            ) : (
+                <span className="opacity-70">{plant.name || plant.type}</span>
+            )}
+        </div>
+    ));
 
     return (
         <Link to={`/setup/${setupId}`} state={{ location: locationName, status: status ?? "" }}
@@ -92,9 +81,13 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
                     </div>
                 </header>
 
-                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.max(sensors.length, 1)}, 1fr)` }} className="gap-2.5">
-                {slots}
-                </div>
+                {plants.length > 0 ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(plants.length, 2)}, 1fr)` }} className="gap-2.5">
+                        {slots}
+                    </div>
+                ) : (
+                    <div className="text-[12px] text-mf-ink-4 font-medium">No plants yet</div>
+                )}
 
                 {loading ? (
                     <div className="text-sm text-mf-ink-2 border-mf-line pt-4">
@@ -124,7 +117,7 @@ export default function GrowingSetupCard({ setupId, locationName, status }: Grow
                         <ReadingTile
                             icon={<SunIcon />}
                             label="Light"
-                            value={setupReadings.light/10}
+                            value={Math.round(setupReadings.light / 10.23)}
                             unit="%"
                             tone="leaf"
                         />

@@ -1,26 +1,67 @@
+import { useEffect } from "react";
 import {
   isRouteErrorResponse,
   Links,
   Meta,
-  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { AuthProvider, useAuth } from "~/context/AuthContext";
+import { AlertsProvider } from "~/context/AlertsContext";
+import AlertToast from "~/components/AlertToast";
+
+const DARK_VARS: Record<string, string> = {
+  "--color-mf-bg":       "#1C1B16",
+  "--color-mf-bg-2":     "#222119",
+  "--color-mf-card":     "#2A2920",
+  "--color-mf-line":     "#383628",
+  "--color-mf-line-2":   "#443F2E",
+  "--color-mf-ink":      "#F0EDE4",
+  "--color-mf-ink-2":    "#C4BEAC",
+  "--color-mf-ink-3":    "#8A8575",
+  "--color-mf-ink-4":    "#5E5A4E",
+  "--color-mf-cream":    "#2E2D23",
+  "--color-mf-sand":     "#3A3828",
+  "--color-mf-forest":   "#5A8A50",
+  "--color-mf-forest-2": "#6AA360",
+};
+
+function ThemeApplier() {
+  const { user } = useAuth();
+  useEffect(() => {
+    const el = document.documentElement;
+    el.classList.remove("light", "dark");
+    // Clear any previously forced dark variables
+    Object.keys(DARK_VARS).forEach((k) => el.style.removeProperty(k));
+
+    if (user?.theme === "dark") {
+      el.classList.add("dark");
+      // Inline styles have the highest CSS priority — guaranteed to override @theme
+      Object.entries(DARK_VARS).forEach(([k, v]) => el.style.setProperty(k, v));
+    } else if (user?.theme === "light") {
+      el.classList.add("light");
+      // No inline overrides needed; default @theme values are already light
+    }
+    // "system" → no inline overrides, CSS @media (prefers-color-scheme: dark) handles it
+  }, [user?.theme]);
+  return null;
+}
 
 export const links: Route.LinksFunction = () => [
-  { 
-    rel: "icon", 
+  {
+    rel: "icon",
     href: "/LogoLight.svg",
-    media: "(prefers-color-scheme: light)" 
+    media: "(prefers-color-scheme: light)",
   },
-  { 
-    rel: "icon", 
+  {
+    rel: "icon",
     href: "/LogoDark.svg",
-    media: "(prefers-color-scheme: dark)" 
+    media: "(prefers-color-scheme: dark)",
   },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -30,7 +71,7 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=DM+Sans:ital,opsz,wght@0,9..40,300..900;1,9..40,300..900&family=JetBrains+Mono:wght@400;500&display=swap",
   },
 ];
 
@@ -54,14 +95,25 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 import { Navbar } from "./components/navbar/Navbar";
 
+const AUTH_PATHS = new Set(["/login", "/register"]);
+
 export default function App() {
+  const location = useLocation();
+  const isAuthPage = AUTH_PATHS.has(location.pathname);
+
   return (
-    <div className="min-h-screen flex flex-col md:block">
-      <Navbar />
-      <div className="flex-1 overflow-auto md:mt-0 pb-20 md:pb-0">
-        <Outlet />
-      </div>
-    </div>
+    <AuthProvider>
+      <AlertsProvider>
+        <ThemeApplier />
+        <AlertToast />
+        <div className="min-h-screen flex flex-col md:block">
+          {!isAuthPage && <Navbar />}
+          <div className={`flex-1 overflow-auto${isAuthPage ? "" : " pb-20 md:pb-0"}`}>
+            <Outlet />
+          </div>
+        </div>
+      </AlertsProvider>
+    </AuthProvider>
   );
 }
 

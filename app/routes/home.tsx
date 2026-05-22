@@ -3,17 +3,19 @@ import {growingSetupsService} from "~/services/growingSetupsService";
 import GrowingSetupCard from "../components/growingSetup/GrowingSetupCard";
 import {AddGrowingSetupModal} from "~/components/growingSetup/AddGrowingSetupPopUp";
 import type {GrowingSetup, SetupReading} from "~/model/growingSetup/types";
+import {useAuth} from "~/context/AuthContext";
 
 export default function Home() {
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [userId, setUserId] = useState<number | null>(1);
+  const userId = user?.id ?? null;
   const [growingSetups, setGrowingSetups] = useState<GrowingSetup[]>([]);
   const [growingSetupError, setGrowingSetupError] = useState(null);
 
-  const [userName, setUserName] = useState("Anya");
-  const [welcomeText, setWelcomeText] = useState(`Good morning, `);
+  const userName = user?.name || user?.email?.split("@")[0] || "";
+  const [welcomeText] = useState(`Good morning, `);
 
 
   // format date to display it in different format
@@ -59,23 +61,12 @@ export default function Home() {
   };
 
     useEffect(() => {
-    //     auth user
-    //     setUserId
-        if(userId == null) {
-            // redirect to login page
-            return;
-        }
+        if (userId == null) return;
 
         const fetchGrowingSetups = async () => {
             const setups = await growingSetupsService.getSetupsByUserID(userId);
-            // catch error if any
             setGrowingSetups(setups);
         };
-
-        //TODO:
-        //fetch user name
-        //fetch  welcome text
-        //fetch random subtext
 
         fetchGrowingSetups();
     }, [userId]);
@@ -84,12 +75,12 @@ export default function Home() {
     <>
         {showConfirmation && (
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity">
-                <div className="bg-[#FAF8F5] rounded-3xl p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
+                <div className="bg-[#FAF8F5] rounded-3xl p-5 sm:p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
                     <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4 text-green-800">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                     </div>
                     <h2 className="text-xl font-serif font-semibold text-gray-900 mb-2">Success!</h2>
-                    <p className="text-gray-600 mb-8 text-center text-sm">Your growing setup has been successfully added to your account.</p>
+                    <p className="text-gray-600 mb-5 sm:mb-8 text-center text-sm">Your growing setup has been successfully added to your account.</p>
                     <button 
                         onClick={() => setShowConfirmation(false)}
                         className="w-full rounded-full py-2 px-6 bg-[#2B4522] text-white font-medium hover:bg-green-900 transition-colors"
@@ -101,12 +92,12 @@ export default function Home() {
         )}
         {showErrorModal && (
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity">
-                <div className="bg-[#FAF8F5] rounded-3xl p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
+                <div className="bg-[#FAF8F5] rounded-3xl p-5 sm:p-8 w-[90%] max-w-sm shadow-xl flex flex-col items-center">
                     <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 text-red-800">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </div>
                     <h2 className="text-xl font-serif font-semibold text-gray-900 mb-2">Error</h2>
-                    <p className="text-gray-600 mb-8 text-center text-sm">We couldn't add your growing setup. Please check the serial number and try again.</p>
+                    <p className="text-gray-600 mb-5 sm:mb-8 text-center text-sm">We couldn't add your growing setup. Please check the serial number and try again.</p>
                     <button 
                         onClick={() => setShowErrorModal(false)}
                         className="w-full rounded-full py-2 px-6 bg-[#2B4522] text-white font-medium hover:bg-green-900 transition-colors"
@@ -116,14 +107,14 @@ export default function Home() {
                 </div>
             </div>
         )}
-        <div className="mx-6 mt-8">
+        <div className="mx-4 sm:mx-6 mt-8">
             <p className="uppercase text-gray-400">{formattedDate}</p>
         </div>
-        <div className="mx-6 mt-1">
-            <h1 className="text-4xl font-bold" >{welcomeText}<span className="italic text-green-900">{userName}</span></h1>
+        <div className="mx-4 sm:mx-6 mt-1">
+            <h1 className="text-3xl sm:text-4xl font-bold">{welcomeText}<span className="italic text-green-900">{userName}</span></h1>
         </div>
 
-        <div className="mx-6 mt-10 flex items-center justify-between">
+        <div className="mx-4 sm:mx-6 mt-10 flex items-center justify-between">
             <p className="mf-small-text">Growing setups</p>
 
             <button
@@ -135,7 +126,7 @@ export default function Home() {
             </button>
         </div>
 
-        <section className="mx-6 mt-4 ">
+        <section className="mx-4 sm:mx-6 mt-4">
             {growingSetups?.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {growingSetups.map((setup) => (
@@ -149,10 +140,9 @@ export default function Home() {
                 </div>
             ) : growingSetupError ? (
                 <div
-                    className="mf-card flex flex-col items-center text-center
-                       p-8 border-dashed border-[#E9C3B5] bg-[#F4DBD2]/40"
+                    className="mf-card flex flex-col items-center text-center p-8 border-dashed border-mf-err/30 bg-mf-err/8"
                 >
-                    <h2 className="mf-h2 text-xl text-[#7A2E1A]">Something went wrong</h2>
+                    <h2 className="mf-h2 text-xl text-mf-err">Something went wrong</h2>
                     <p className="mt-1 text-sm text-mf-ink-2 max-w-sm">
                         Unable to load growing setups. Try refreshing the page.
                     </p>
@@ -193,6 +183,6 @@ export default function Home() {
         onClose={() => setIsModalOpen(false)}
         onContinue={handleContinue}
       />
-    </div>
+    </>
   );
 }

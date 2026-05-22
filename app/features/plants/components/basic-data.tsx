@@ -5,7 +5,7 @@ import type { SensorReading } from "../../../model/sensor/types";
 import "./basic-data.css";
 export default function BasicData() {
 
-  const { plantId } = useParams();
+  const { plantId, sensorId } = useParams();
 
   const [reading, setReading] =
     useState<SensorReading | null>(null);
@@ -18,11 +18,11 @@ export default function BasicData() {
 
   useEffect(() => {
 
-    if (!plantId) return;
+    if (!plantId || !sensorId) return;
 
     setLoading(true);
 
-    sensorService.getLatestReading(7)
+    sensorService.getLatestReading(Number(sensorId))
       .then((data) => {
 
         setReading(data);
@@ -43,7 +43,7 @@ export default function BasicData() {
         setLoading(false);
       });
 
-  }, [plantId]);
+  }, [plantId, sensorId]);
 
   if (loading) {
     return (

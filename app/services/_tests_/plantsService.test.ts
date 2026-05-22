@@ -6,6 +6,7 @@ import type { Plant } from "../../model/plant/types";
 vi.mock("../../api/client", () => ({
   default: { get: vi.fn() },
 }));
+vi.mock("~/mocks/index", () => ({ isMockEnabled: false }));
 
 const mockGet = vi.mocked(api.get);
 

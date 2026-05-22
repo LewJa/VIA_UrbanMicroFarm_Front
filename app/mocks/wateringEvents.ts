@@ -41,3 +41,20 @@ export const MOCK_WATERING_EVENTS: WateringEvent[] = [
     mode: "automatic",
   },
 ];
+
+export const mockWatering = {
+  triggerManualWatering: async (_plantId: number): Promise<{ message: string }> => ({
+    message: "Watering triggered successfully (MOCK)",
+  }),
+
+  getLastWateringEvent: async (_setupId: number): Promise<WateringEvent> => ({
+    eventId: MOCK_WATERING_EVENTS[MOCK_WATERING_EVENTS.length - 1].eventId,
+    startTime: new Date(Date.now() - 60_000).toISOString(),
+    endTime: new Date().toISOString(),
+    waterUsedLiters: 0.5,
+    mode: "manual",
+  }),
+
+  getHistoricalWateringEvents: async (_setupId: number): Promise<WateringEvent[]> =>
+    MOCK_WATERING_EVENTS,
+};

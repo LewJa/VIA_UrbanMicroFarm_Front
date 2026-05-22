@@ -76,44 +76,28 @@ export default function PlantCard({
       <div className="plant-tabs">
 
         <button
-          className={
-            activeTab === "now"
-              ? "tab active"
-              : "tab"
-          }
+          className={activeTab === "now" ? "tab active" : "tab"}
           onClick={() => setActiveTab("now")}
         >
           Now
         </button>
 
         <button
-          className={
-            activeTab === "about"
-              ? "tab active"
-              : "tab"
-          }
+          className={activeTab === "about" ? "tab active" : "tab"}
           onClick={() => setActiveTab("about")}
         >
           About
         </button>
 
         <button
-          className={
-            activeTab === "predictions"
-              ? "tab active"
-              : "tab"
-          }
+          className={activeTab === "predictions" ? "tab active" : "tab"}
           onClick={() => setActiveTab("predictions")}
         >
           Predictions
         </button>
 
         <button
-          className={
-            activeTab === "history"
-              ? "tab active"
-              : "tab"
-          }
+          className={activeTab === "history" ? "tab active" : "tab"}
           onClick={() => setActiveTab("history")}
         >
           History
@@ -126,75 +110,35 @@ export default function PlantCard({
         <div className="stats-container">
 
           <div className="stat-card">
-
             <div>
-              <p className="stat-title">
-                Moisture
-              </p>
-
-              <p className="stat-subtitle">
-                last watered 6h ago
-              </p>
+              <p className="stat-title">Moisture</p>
+              <p className="stat-subtitle">last watered 6h ago</p>
             </div>
-
-            <p className="stat-value">
-              {moisture}%
-            </p>
-
+            <p className="stat-value">{moisture}%</p>
           </div>
 
           <div className="stat-card">
-
             <div>
-              <p className="stat-title">
-                Temperature
-              </p>
-
-              <p className="stat-subtitle">
-                range 18°–25°
-              </p>
+              <p className="stat-title">Temperature</p>
+              <p className="stat-subtitle">range 18°–25°</p>
             </div>
-
-            <p className="stat-value">
-              {temperature}°C
-            </p>
-
+            <p className="stat-value">{temperature}°C</p>
           </div>
 
           <div className="stat-card">
-
             <div>
-              <p className="stat-title">
-                Humidity
-              </p>
-
-              <p className="stat-subtitle">
-                ambient air
-              </p>
+              <p className="stat-title">Humidity</p>
+              <p className="stat-subtitle">ambient air</p>
             </div>
-
-            <p className="stat-value">
-              {humidity}%
-            </p>
-
+            <p className="stat-value">{humidity}%</p>
           </div>
 
           <div className="stat-card">
-
             <div>
-              <p className="stat-title">
-                Light
-              </p>
-
-              <p className="stat-subtitle">
-                6.4 hrs of sun
-              </p>
+              <p className="stat-title">Light</p>
+              <p className="stat-subtitle">6.4 hrs of sun</p>
             </div>
-
-            <p className="stat-value">
-              {light}%
-            </p>
-
+            <p className="stat-value">{light}%</p>
           </div>
 
         </div>
@@ -206,36 +150,25 @@ export default function PlantCard({
         <div className="stats-container">
 
           <div className="about-card">
-
-            <p className="about-label">
-              DESCRIPTION
-            </p>
-
+            <p className="about-label">DESCRIPTION</p>
             <p className="about-text">
               Genovese basil started from seed on April 12.
               Pinched twice — first set of leaves harvested
               for caprese. Likes the south-facing greenhouse
               spot and the morning fog from the humidifier.
             </p>
-
-            <p className="edit-text">
-              Edit description
-            </p>
-
+            <p className="edit-text">Edit description</p>
           </div>
 
           <div className="details-card">
-
             <div className="details-row">
               <span>Type</span>
               <span>Herb · Lamiaceae</span>
             </div>
-
             <div className="details-row">
               <span>Planted</span>
               <span>April 12, 2026</span>
             </div>
-
           </div>
 
         </div>
@@ -245,15 +178,9 @@ export default function PlantCard({
       {activeTab === "predictions" && (
 
         <div className="stats-container">
-
           <div className="stat-card">
-
-            <p className="stat-title">
-              Plant health prediction: Healthy
-            </p>
-
+            <p className="stat-title">Plant health prediction: Healthy</p>
           </div>
-
         </div>
 
       )}
@@ -263,30 +190,13 @@ export default function PlantCard({
         <div className="stats-container">
 
           {[1, 2, 3, 4].map((item) => (
-
-            <div
-              className="history-card"
-              key={item}
-            >
-
+            <div className="history-card" key={item}>
               <div>
-
-                <p className="stat-title">
-                  Auto watering · 120ml
-                </p>
-
-                <p className="stat-subtitle">
-                  Today, 06:12
-                </p>
-
+                <p className="stat-title">Auto watering · 120ml</p>
+                <p className="stat-subtitle">Today, 06:12</p>
               </div>
-
-              <p className="history-value">
-                 62%→71%
-              </p>
-
+              <p className="history-value">62%→71%</p>
             </div>
-
           ))}
 
         </div>
