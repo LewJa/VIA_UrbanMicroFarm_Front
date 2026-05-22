@@ -4,7 +4,10 @@ import { wateringService } from "../../../services/wateringService";
 import { getPlant, updatePlantPhoto } from "../../../services/plantsService";
 import type { Plant } from "../../../model/plant/types";
 import plantImg from "../../../assets/plant.png";
-import "./plant-layout.css";
+import {ArrowLeftIcon} from "~/components/icons/icons-specific/ArrowLeftIcon";
+import {Camera} from "~/components/icons/icons-specific/Camera";
+import {DropIcon} from "~/components/icons/icons-specific/Drop";
+import {MoreDotsIcon} from "~/components/icons/icons-specific/MoreDots";
 
 export interface PlantContext {
   plant: Plant | null;
@@ -24,25 +27,39 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
   const [isWatering, setIsWatering] = useState(false);
   const [wateringMessage, setWateringMessage] = useState<{ text: string; ok: boolean } | null>(null);
   const [plant, setPlant] = useState<Plant | null>(null);
+  const [lastWatering, setLastWatering] = useState<string | null>(null);
   const [plantLoading, setPlantLoading] = useState(true);
   const [plantError, setPlantError] = useState<string | null>(null);
   const photoInputRef = useRef<HTMLInputElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setIsMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   useEffect(() => {
     setPlantLoading(true);
     setPlantError(null);
-    getPlant(Number(plantId))
-      .then((data) => {
+
+    const load = async () => {
+      try {
+        const data = await getPlant(Number(plantId));
         setPlant(data);
-        setPlantLoading(false);
-      })
-      .catch((err: unknown) => {
+        const last = await wateringService.getLastWateringEvent(data.id);
+        setLastWatering(last.createdAt);
+      } catch (err: unknown) {
         const axiosErr = err as { response?: { data?: { error?: { message?: string } } } };
-        setPlantError(
-          axiosErr?.response?.data?.error?.message ?? "Failed to load plant data.",
-        );
+        setPlantError(axiosErr?.response?.data?.error?.message ?? "Failed to load plant data.");
+      } finally {
         setPlantLoading(false);
-      });
+      }
+    };
+
+    load();
   }, [plantId]);
 
   const handleManualWatering = async () => {
@@ -75,6 +92,29 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
     reader.readAsDataURL(file);
   };
 
+  const splitTitle = (name: string) => {
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) return { head: "", tail: parts[0] };
+    return { head: parts.slice(0, -1).join(" "), tail: parts[parts.length - 1] };
+  }
+
+  const daysSincePlanted = (datePlanted: string): number => {
+    const diff = Date.now() - new Date(datePlanted).getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+  };
+
+  const formatLastWatered = (iso: string | null): string => {
+    if (!iso) return "Never watered";
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    if (minutes < 1) return "Watered just now";
+    if (minutes < 60) return `Last watered ${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Last watered ${hours}h ${minutes % 60}m ago`;
+    const days = Math.floor(hours / 24);
+    return `Last watered ${days}d ${hours % 24}h ago`;
+  };
+
   const tabs = [
     { name: "Basic data", path: "basic-data" },
     { name: "Predictions", path: "predictions" },
@@ -82,145 +122,259 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
   ];
 
   const plantContext: PlantContext = { plant, plantLoading, plantError };
+  const title = splitTitle(plant?.name ?? `Plant ${plantId}`);
 
   return (
     <>
-    <div className="dashboard-wrapper">
-      <div className="dashboard-container">
+    <div className="min-h-screen bg-mf-bg text-mf-ink">
+      <div className="mx-auto max-w-3xl px-6 pb-24">
         <button
           onClick={() => navigate(`/setup/${setupId}`)}
           className="flex items-center gap-1.5 mb-5 text-[13px] font-medium text-mf-ink-3 hover:text-mf-ink transition-colors"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <ArrowLeftIcon/>
           Back to setup
         </button>
 
-        <div className="dashboard-header-bar">
-          <h1 className="dashboard-title">
-            {plant ? plant.name : `Plant ${plantId}`}
-          </h1>
+        <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePhotoUpload}
+        />
 
-          <div className="menu-container">
-            <button
-              className="menu-button"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+        <button
+            type="button"
+            onClick={() => photoInputRef.current?.click()}
+            className="group relative block w-full aspect-[16/10] sm:aspect-[16/9]
+                     rounded-mf-xl overflow-hidden bg-mf-card/80
+                     border border-mf-line focus:outline-none focus:ring-[3px] focus:ring-mf-forest/15"
+            title="Upload plant photo"
+        >
+          {plant?.photo ? (
+              <img
+                  src={plant.photo}
+                  alt={plant.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+              />
+          ) : plantImg ? (
+              <img
+                  src={plantImg}
+                  alt="Plant"
+                  className="absolute inset-0 w-full h-full object-contain p-10 opacity-90"
+              />
+          ) : (
+              <span className="opacity-70">drop a photo</span>
+          )}
+
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-mf-ink/0 group-hover:bg-mf-ink/30 transition-colors flex items-center justify-center">
+            <span
+                className="flex items-center gap-2 px-4 h-9 rounded-full
+                         bg-mf-cream text-mf-ink text-[12px] font-medium
+                         opacity-0 group-hover:opacity-100 transition-opacity shadow-mf-2"
             >
-              ⋮
-            </button>
-            {isMenuOpen && (
-              <div className="dropdown-menu">
-                <button
-                  className="dropdown-item"
-                  onClick={() => {
-                    setIsConfirmPopupOpen(true);
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  Water manually
-                </button>
-              </div>
-            )}
+              <Camera />
+              {plant?.photo ? "Change photo" : "Upload photo"}
+            </span>
           </div>
-        </div>
+        </button>
 
-        {isConfirmPopupOpen && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-mf-card border border-mf-line rounded-[20px] p-7 w-[90%] max-w-sm text-center shadow-mf-3">
-              <h2 className="font-serif text-[22px] text-mf-ink mb-2">Confirm watering</h2>
-              <p className="text-[14px] text-mf-ink-2 mb-6">Are you sure you want to trigger manual watering for this plant?</p>
-              <div className="flex gap-3 justify-center">
-                <button
-                  className="mf-btn mf-btn-secondary"
-                  onClick={() => setIsConfirmPopupOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="mf-btn mf-btn-primary disabled:opacity-50"
-                  onClick={handleManualWatering}
-                  disabled={isWatering}
-                >
-                  {isWatering ? "Watering…" : "Confirm"}
-                </button>
-              </div>
+        <header className="mt-6 flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="mf-small-text">
+              {plant?.type ?? "Plant species"}
+              {plant?.datePlanted != null && <> · Day {daysSincePlanted(plant.datePlanted) + 1}</>}
+            </p>
+            <h1 className="mf-h1 text-4xl sm:text-5xl mt-1.5 leading-[1.05]">
+              {title.head && <>{title.head} </>}
+              <em className="not-italic text-mf-forest" style={{ fontStyle: "italic" }}>
+                {title.tail}
+              </em>
+            </h1>
+
+            {/* Status chips */}
+            <div className="flex flex-wrap gap-2 mt-4">
+              {plantLoading ? (
+                  <span className="mf-chip">
+                  <span className="mf-chip-dot opacity-50" />
+                  loading…
+                </span>
+              ) : plantError ? (
+                  <span className="mf-chip mf-chip-err">
+                  <span className="mf-chip-dot" />
+                  error
+                </span>
+              ) : (
+                  <>
+                  <span className="mf-chip mf-chip-ok">
+                    <span className="mf-chip-dot" />
+                    thriving
+                  </span>
+                    <span className="mf-chip">
+                    <DropIcon />
+                      {formatLastWatered(lastWatering)}
+                  </span>
+                  </>
+              )}
             </div>
           </div>
-        )}
 
-        <div className="dashboard-content">
-          <div className="plant-container">
-            <input
-              ref={photoInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handlePhotoUpload}
-            />
+          {/* Kebab menu */}
+          <div className="relative shrink-0" ref={menuRef}>
             <button
-              type="button"
-              className="relative group w-full max-w-[260px] aspect-square rounded-2xl overflow-hidden focus:outline-none"
-              onClick={() => photoInputRef.current?.click()}
-              title="Upload plant photo"
+                type="button"
+                onClick={() => setIsMenuOpen((v) => !v)}
+                className="h-10 w-10 rounded-full bg-mf-card border border-mf-line
+                         text-mf-ink-2 flex items-center justify-center
+                         hover:bg-mf-cream transition-colors"
+                aria-label="More options"
+                aria-expanded={isMenuOpen}
             >
-              {plant?.photo ? (
-                <>
-                  <img src={plant.photo} alt={plant.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-hover:opacity-100 transition-opacity drop-shadow">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
-                    </svg>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <img src={plantImg} alt="Plant" className="w-full h-full object-contain p-4" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end justify-center pb-4">
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[11px] font-bold uppercase tracking-wide text-mf-ink bg-mf-card/80 px-3 py-1 rounded-full">
-                      Upload photo
-                    </span>
-                  </div>
-                </>
-              )}
+              <MoreDotsIcon />
             </button>
-            <p id="plant-species">{plant?.type ?? "Plant species"}</p>
+
+            {isMenuOpen && (
+                <div
+                    className="absolute right-0 top-12 z-30 min-w-[180px]
+                           mf-card shadow-mf-3 py-1
+                           animate-[fadeIn_.12s_ease-out]"
+                    role="menu"
+                >
+                  <button
+                      className="w-full text-left px-4 py-2.5 text-sm text-mf-ink
+                             hover:bg-mf-cream transition-colors flex items-center gap-2"
+                      onClick={() => {
+                        setIsConfirmPopupOpen(true);
+                        setIsMenuOpen(false);
+                      }}
+                      role="menuitem"
+                  >
+                    <span className="text-mf-water"><DropIcon /></span>
+                    Water manually
+                  </button>
+                </div>
+            )}
           </div>
-          <div className="data-container">
-            <div className="flex gap-1 p-1 bg-mf-cream rounded-full mb-1 overflow-x-auto">
-              {tabs.map((tab) => (
-                <NavLink
+        </header>
+
+        <div className="mt-8 mf-tabs">
+          {tabs.map((tab) => (
+              <NavLink
                   key={tab.name}
                   to={tab.path}
                   end={tab.path === "." || tab.path === ""}
                   viewTransition
                   preventScrollReset
                   className={({ isActive }) =>
-                    `flex flex-shrink-0 flex-1 h-9 items-center justify-center rounded-full text-[12px] sm:text-[13px] font-medium no-underline border-0 transition-all duration-150 px-2 sm:px-3 whitespace-nowrap min-w-0 ${
-                      isActive
-                        ? "bg-mf-card text-mf-ink shadow-mf-1"
-                        : "bg-transparent text-mf-ink-2 hover:bg-mf-card/60"
-                    }`
+                      [
+                        "flex-1 h-9 inline-flex items-center justify-center",
+                        "rounded-full text-[13px] font-medium no-underline",
+                        "transition-colors px-3 whitespace-nowrap",
+                        isActive
+                            ? "bg-mf-card text-mf-ink shadow-mf-1"
+                            : "bg-transparent text-mf-ink-2 hover:text-mf-ink",
+                      ].join(" ")
                   }
-                >
-                  {tab.name}
-                </NavLink>
-              ))}
-            </div>
+              >
+                {tab.name}
+              </NavLink>
+          ))}
+        </div>
 
-            <div className="tab-content-area">
-              <div className="outlet-container">
-                <Outlet context={plantContext} />
+        {/* ── Tab content ──────────────────────────────────────── */}
+        <section className="mt-6">
+          <Outlet context={plantContext} />
+        </section>
+      </div>
+
+      <div>
+
+        {isConfirmPopupOpen && (
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-4
+                     bg-mf-ink/40 backdrop-blur-sm animate-[fadeIn_.15s_ease-out]"
+                onClick={() => setIsConfirmPopupOpen(false)}
+            >
+              <div
+                  className="mf-card w-full max-w-sm p-7 text-center shadow-mf-3
+                       animate-[scaleIn_.18s_ease-out]"
+                  onClick={(e) => e.stopPropagation()}
+              >
+                <div className="h-14 w-14 mx-auto rounded-full bg-[#DCE7EC] text-mf-water
+                            flex items-center justify-center mb-4">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z" />
+                  </svg>
+                </div>
+                <h2 className="mf-h2 text-2xl text-mf-ink">Water this plant?</h2>
+                <p className="mt-1 text-sm text-mf-ink-3">
+                  We'll trigger a manual watering cycle now.
+                </p>
+                <div className="flex gap-2 justify-center mt-6">
+                  <button
+                      className="mf-btn mf-btn-ghost"
+                      onClick={() => setIsConfirmPopupOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                      className="mf-btn mf-btn-water disabled:opacity-40"
+                      onClick={handleManualWatering}
+                      disabled={isWatering}
+                  >
+                    {isWatering ? "Watering…" : "Water now"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+        )}
+
+        {/*{isConfirmPopupOpen && (*/}
+        {/*  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">*/}
+        {/*    <div className="bg-mf-card border border-mf-line rounded-[20px] p-7 w-[90%] max-w-sm text-center shadow-mf-3">*/}
+        {/*      <h2 className="font-serif text-[22px] text-mf-ink mb-2">Confirm watering</h2>*/}
+        {/*      <p className="text-[14px] text-mf-ink-2 mb-6">Are you sure you want to trigger manual watering for this plant?</p>*/}
+        {/*      <div className="flex gap-3 justify-center">*/}
+        {/*        <button*/}
+        {/*          className="mf-btn mf-btn-secondary"*/}
+        {/*          onClick={() => setIsConfirmPopupOpen(false)}*/}
+        {/*        >*/}
+        {/*          Cancel*/}
+        {/*        </button>*/}
+        {/*        <button*/}
+        {/*          className="mf-btn mf-btn-primary disabled:opacity-50"*/}
+        {/*          onClick={handleManualWatering}*/}
+        {/*          disabled={isWatering}*/}
+        {/*        >*/}
+        {/*          {isWatering ? "Watering…" : "Confirm"}*/}
+        {/*        </button>*/}
+        {/*      </div>*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*)}*/}
+
+
       </div>
     </div>
 
-    {wateringMessage && (
-      <div className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-medium shadow-mf-2 z-50 ${wateringMessage.ok ? "bg-mf-forest text-[#F4EEDB]" : "bg-mf-err text-[#F4EEDB]"}`}>
-        {wateringMessage.text}
-      </div>
-    )}
+      {wateringMessage && (
+          <div
+              className={[
+                "fixed bottom-6 left-1/2 -translate-x-1/2 z-50",
+                "whitespace-nowrap px-4 h-10 inline-flex items-center gap-2",
+                "rounded-full text-lg font-medium shadow-mf-3",
+                "animate-[scaleIn_.18s_ease-out]",
+                wateringMessage.ok
+                    ? "bg-mf-forest text-mf-cream"
+                    : "bg-mf-err text-mf-cream",
+              ].join(" ")}
+          >
+            <span className="mf-chip-dot bg-current opacity-80" />
+            {wateringMessage.text}
+          </div>
+      )}
     </>
   );
 }

@@ -14,11 +14,10 @@ export interface SetupReading {
 }
 
 export interface WateringEvent {
-  eventId: number;
-  startTime: string;
-  endTime: string;
-  waterUsedLiters: number;
+  id: number;
+  waterUsedMl: number;
   mode: "manual" | "automatic";
+  createdAt: string;
 }
 
 export interface MoistureSensor {
