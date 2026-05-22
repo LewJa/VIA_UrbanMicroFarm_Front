@@ -71,10 +71,19 @@ export default function GrowingSetupPage() {
             .then(([readingData, sensorData, plantData, setupData]) => {
                 if (!alive) return;
                 setReading(readingData);
-                setSensors(sensorData.filter((s) => s.sensorType !== "Soil_Moisture"));
-                setMoistureSensors(sensorData.filter((s) => s.sensorType === "Soil_Moisture"));
+
+                const moisture = sensorData.filter((s) => s.sensorType === "Soil_Moisture");
+                const others = sensorData.filter((s) => s.sensorType !== "Soil_Moisture");
+
+                setSensors(others);
+                setMoistureSensors(moisture);
+                setSetup({
+                    id: setupData.id,
+                    location: setupData.location,
+                    status: setupData.status,
+                    sensorSlots: moisture.length,
+                });
                 setPlants(plantData);
-                setSetup({id: setupData.id, location: setupData.location, status: setupData.status, sensorSlots: moistureSensors.length});
                 setPageStatus("success");
             })
             .catch((err: any) => {
@@ -331,7 +340,7 @@ export default function GrowingSetupPage() {
                                     );
                                 })}
 
-                                {plants.length >= 0 && (
+                                {plants.length < (setup?.sensorSlots ?? 0) && (
                                     <div className="rounded-[16px] border-[1.5px] border-dashed border-mf-line-2 bg-mf-cream hover:bg-mf-card p-3 sm:p-4 flex items-center justify-between hover:border-mf-clay-2 transition-colors cursor-pointer group" onClick={() => setIsModalOpen(true)}>
                                         <div className="flex items-center gap-4">
                                             <div className="w-[60px] h-[60px] sm:w-[68px] sm:h-[68px] rounded-xl border border-dashed border-mf-line-2 bg-mf-card flex items-center justify-center text-mf-line-2 group-hover:border-mf-clay-2 group-hover:text-mf-clay-2 transition-colors">
@@ -373,35 +382,55 @@ export default function GrowingSetupPage() {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-[13px] text-mf-ink-3">Connected sensors</span>
-                                <span className="text-[14px] font-medium text-mf-ink">{sensors.length}</span>
+                                <span className="text-[14px] font-medium text-mf-ink">{sensors.length + moistureSensors.length}</span>
                             </div>
                         </div>
                     )}
                     {activeTab === "Sensors" && (
                         <div className="flex flex-col gap-3 mb-10">
-                            {sensors.length === 0 ? (
-                                <div className="p-8 text-center text-mf-ink-4 font-medium border border-dashed border-mf-line-2 rounded-[16px]">
+                            {sensors.length === 0 && moistureSensors.length === 0 ? (
+                                <div className="p-8 text-center text-mf-ink-4 font-medium border border-dashed border-mf-err/30 bg-mf-err/10 rounded-[16px]">
                                     No sensors connected to this setup.
                                 </div>
                             ) : (
-                                sensors.map((sensor, i) => (
-                                    <div key={sensor.id} className="mf-card p-4 flex items-center justify-between">
-                                        <div className="flex flex-col gap-0.5">
-                                            <span className="text-[14px] font-medium text-mf-ink">Sensor #{sensor.id}</span>
-                                            <span className="text-[11px] uppercase tracking-widest text-mf-ink-4 font-semibold">Type: {sensor.sensorType}</span>
+                                <>
+                                    {moistureSensors.map((sensor, i) => (
+                                        <div key={sensor.id} className="mf-card p-4 flex items-center justify-between">
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-[14px] font-medium text-mf-ink">Sensor #{sensor.id}</span>
+                                                <span className="text-[11px] uppercase tracking-widest text-mf-ink-4 font-semibold">Soil moisture</span>
+                                            </div>
+                                            {sensor.status === "Active" ? (
+                                                <div className="mf-chip mf-chip-ok px-2.5 py-1.5 h-auto">
+                                                    <div className="mf-chip-dot"></div>
+                                                    <span className="text-[12px] font-bold tracking-wide pl-1">Active</span>
+                                                </div>
+                                            ) : (
+                                                <div className="mf-chip px-2.5 py-1.5 h-auto bg-mf-line/30 text-mf-ink-4">
+                                                    <span className="text-[12px] font-bold tracking-wide">No data</span>
+                                                </div>
+                                            )}
                                         </div>
-                                        {sensor.status === "Active" ? (
-                                            <div className="mf-chip mf-chip-ok px-2.5 py-1.5 h-auto">
-                                                <div className="mf-chip-dot"></div>
-                                                <span className="text-[12px] font-bold tracking-wide pl-1">Active</span>
+                                    ))}
+                                    {sensors.map((sensor) => (
+                                        <div key={sensor.id} className="mf-card p-4 flex items-center justify-between">
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-[14px] font-medium text-mf-ink">Sensor #{sensor.id}</span>
+                                                <span className="text-[11px] uppercase tracking-widest text-mf-ink-4 font-semibold">{sensor.sensorType}</span>
                                             </div>
-                                        ) : (
-                                            <div className="mf-chip px-2.5 py-1.5 h-auto bg-mf-line/30 text-mf-ink-4">
-                                                <span className="text-[12px] font-bold tracking-wide">No data</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))
+                                            {sensor.status === "Active" ? (
+                                                <div className="mf-chip mf-chip-ok px-2.5 py-1.5 h-auto">
+                                                    <div className="mf-chip-dot"></div>
+                                                    <span className="text-[12px] font-bold tracking-wide pl-1">Active</span>
+                                                </div>
+                                            ) : (
+                                                <div className="mf-chip px-2.5 py-1.5 h-auto bg-mf-line/30 text-mf-ink-4">
+                                                    <span className="text-[12px] font-bold tracking-wide">No data</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </>
                             )}
                         </div>
                     )}
