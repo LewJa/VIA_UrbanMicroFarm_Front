@@ -14,15 +14,17 @@ export default function Predictions() {
   }
 
   if (plantError) {
-    return <div role="alert">{plantError}</div>;
+    return (
+        <div
+            role="alert"
+            className="mf-card p-6 border-[#E9C3B5] bg-[#F4DBD2]/40 text-mf-ink-2 text-sm"
+        >
+          {plantError}
+        </div>
+    );
   }
 
   if (!plant) return null;
 
-  return (
-    <PredictionsChart
-      plantId={plant.id}
-      plantName={plant.name}
-    />
-  );
+  return <PredictionsChart plantId={plant.id} plantName={plant.name} />;
 }
