@@ -13,24 +13,39 @@ import { wateringService } from "~/services/wateringService";
 import type { SensorHistoricalReading } from "~/model/sensor/types";
 import type { WateringEvent } from "~/model/growingSetup/types";
 
+const COLOR = {
+  moisture: "#3F6638", // mf-forest-2 — primary line
+  area:     "rgba(63,102,56,.10)",
+  grid:     "#E6DFCE", // mf-line
+  axis:     "#A8A492", // mf-ink-4
+  manual:   "#8A6F4A", // mf-clay (human action → warm)
+  auto:     "#5A7B8C", // mf-water (system action → cool)
+  card:     "#FFFFFF",
+};
+
 const MODE_LABELS: Record<WateringEvent["mode"], string> = {
   manual: "Manual",
   automatic: "Automatic",
 };
-
 const WATERING_COLOR: Record<WateringEvent["mode"], string> = {
-  manual: "#f97316",
-  automatic: "#3b82f6",
+  manual: COLOR.manual,
+  automatic: COLOR.auto,
 };
 
-type Range = "24h" | "7d" | "30d";
+type Range = "7d" | "30d" | "90d";
+
+const RANGES: { label: string; value: Range }[] = [
+  { label: "7 days",  value: "7d"  },
+  { label: "30 days", value: "30d" },
+  { label: "90 days", value: "90d" },
+];
+
 
 interface Props {
   sensorId: number;
   plantName?: string;
   setupId?: number;
 }
-
 interface ChartPoint {
   time: number;
   moisture: number;
@@ -38,46 +53,36 @@ interface ChartPoint {
   _wateringEvent?: WateringEvent;
 }
 
-const adcToPercent = (value: number): number =>
-  Math.round((value / 1023) * 100);
 
 function getRangeTimestamps(range: Range): { from: string; to: string } {
   const to = new Date();
   const from = new Date(to);
-  if (range === "24h") from.setHours(from.getHours() - 24);
-  else if (range === "7d") from.setDate(from.getDate() - 7);
-  else from.setDate(from.getDate() - 30);
+  if (range === "7d")  from.setDate(from.getDate() - 7);
+  else if (range === "30d") from.setDate(from.getDate() - 30);
+  else from.setDate(from.getDate() - 90);
   return { from: from.toISOString(), to: to.toISOString() };
 }
 
 function formatXTick(range: Range): (ts: number) => string {
   return (ts: number) => {
     const d = new Date(ts);
-    if (range === "24h")
-      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    if (range === "7d")
+      return d.toLocaleDateString([], { weekday: "short", day: "numeric" });
     return d.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 }
 
-const RANGES: { label: string; value: Range }[] = [
-  { label: "24h", value: "24h" },
-  { label: "7 days", value: "7d" },
-  { label: "30 days", value: "30d" },
-];
-
 export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId }: Props) {
   const [range, setRange] = useState<Range>("7d");
-  const [status, setStatus] = useState<"loading" | "error" | "empty" | "success">("loading");
+  const [status, setStatus] =
+      useState<"loading" | "error" | "empty" | "success">("loading");
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [wateringError, setWateringError] = useState(false);
 
   useEffect(() => {
-    if (setupId === undefined) {
-      console.warn(
-        "SoilMoistureHistoryChart: setupId not provided, watering overlay disabled",
-      );
-    }
+    if (setupId === undefined)
+      console.warn("SoilMoistureHistoryChart: setupId not provided, watering overlay disabled");
   }, [setupId]);
 
   const fetchData = useCallback(async () => {
@@ -85,48 +90,42 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId 
     setErrorMessage("");
     setWateringError(false);
     const { from, to } = getRangeTimestamps(range);
-
     try {
       const readings = await sensorService.getHistoricalReadings(sensorId, { from, to });
+      console.log(readings);
       if (readings.length <= 1) {
         setStatus("empty");
         return;
       }
-
       const moisturePoints: ChartPoint[] = readings.map((r: SensorHistoricalReading) => ({
         time: new Date(r.timestamp).getTime(),
-        moisture: adcToPercent(r.value),
+        moisture: r.value,
         timestamp: r.timestamp,
       }));
-
       if (setupId !== undefined) {
         try {
           const events = await wateringService.getHistoricalWateringEvents(setupId, from, to);
+          console.log(events)
           for (const event of events) {
-            const eventMid = (Date.parse(event.startTime) + Date.parse(event.endTime)) / 2;
+            const eventTime = Date.parse(event.createdAt);
             let nearest = moisturePoints[0];
             let minDiff = Infinity;
             for (const pt of moisturePoints) {
-              const diff = Math.abs(pt.time - eventMid);
+              const diff = Math.abs(pt.time - eventTime);
               if (diff < minDiff) { minDiff = diff; nearest = pt; }
             }
-            if (nearest) nearest._wateringEvent = event;
+            nearest._wateringEvent = event;
           }
         } catch (err) {
-          console.error("SoilMoistureHistoryChart: watering events fetch failed", err);
+          console.error("watering events fetch failed", err);
           setWateringError(true);
         }
       }
-
       setChartData(moisturePoints);
       setStatus("success");
     } catch (err: unknown) {
-      const axiosErr = err as {
-        response?: { data?: { error?: { message?: string } } };
-      };
-      setErrorMessage(
-        axiosErr?.response?.data?.error?.message ?? "Failed to load moisture data.",
-      );
+      const axiosErr = err as { response?: { data?: { error?: { message?: string } } } };
+      setErrorMessage(axiosErr?.response?.data?.error?.message ?? "Failed to load moisture data.");
       setStatus("error");
     }
   }, [sensorId, setupId, range]);
@@ -135,167 +134,201 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId 
     fetchData();
   }, [fetchData]);
 
-  const title = plantName ? `${plantName} — Soil Moisture` : "Soil Moisture";
-
   return (
-    <div>
-      <h3>{title}</h3>
-
-      <div role="group" aria-label="Time range" className="flex gap-1 p-1 bg-mf-cream rounded-full w-fit my-3">
-        {RANGES.map((r) => (
-          <button
-            key={r.value}
-            onClick={() => setRange(r.value)}
-            aria-pressed={range === r.value}
-            className={`h-8 px-3 rounded-full text-[13px] font-medium cursor-pointer border-0 transition-all duration-150 ${
-              range === r.value
-                ? "bg-mf-card text-mf-ink shadow-mf-1"
-                : "bg-transparent text-mf-ink-2 hover:bg-mf-card/60"
-            }`}
-          >
-            {r.label}
-          </button>
-        ))}
-      </div>
-
-      {status === "loading" && (
-        <div aria-busy="true" aria-label="Loading soil moisture data">
-          Loading…
-        </div>
-      )}
-
-      {status === "error" && (
-        <div role="alert">
-          <p>{errorMessage}</p>
-          <button onClick={fetchData}>Retry</button>
-        </div>
-      )}
-
-      {status === "empty" && (
-        <p>
-          No moisture history yet. Readings will appear here once your sensor
-          has been active for a while.
-        </p>
-      )}
-
-      {status === "success" && (
-        <>
-          <div role="list" aria-label="Chart legend">
-            <div role="listitem" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginRight: 12 }}>
-              <span
-                aria-hidden="true"
-                style={{ display: "inline-block", width: 24, height: 3, borderRadius: 2, background: "#4ade80" }}
-              />
-              Soil Moisture
-            </div>
-            {setupId !== undefined && (
-              <>
-                <div role="listitem" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginRight: 12 }}>
-                  <span
-                    aria-hidden="true"
-                    data-testid="legend-manual"
-                    data-shape="circle"
-                    style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: WATERING_COLOR.manual }}
-                  />
-                  Manual Watering
-                </div>
-                <div role="listitem" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginRight: 12 }}>
-                  <span
-                    aria-hidden="true"
-                    data-testid="legend-automatic"
-                    data-shape="square"
-                    style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: WATERING_COLOR.automatic }}
-                  />
-                  Automatic Watering
-                </div>
-              </>
-            )}
-            {wateringError && (
-              <span aria-live="polite" style={{ fontSize: "0.75rem", color: "#9ca3af", marginLeft: 8 }}>
-                Watering data unavailable
-              </span>
-            )}
+      <article className="mf-card p-5 sm:p-6 flex flex-col gap-5">
+        <header className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="mf-eyebrow">Soil moisture</p>
+            <h3 className="mf-h2 text-2xl mt-1 text-mf-ink">
+              {plantName ? (
+                  <>
+                    History of <em className="not-italic text-mf-forest" style={{ fontStyle: "italic" }}>{plantName}</em>
+                  </>
+              ) : (
+                  "History"
+              )}
+            </h3>
           </div>
 
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="time"
-                type="number"
-                scale="time"
-                domain={["dataMin", "dataMax"]}
-                tickFormatter={formatXTick(range)}
-              />
-              <YAxis
-                domain={[0, 100]}
-                label={{ value: "Moisture (%)", angle: -90, position: "insideLeft" }}
-              />
+          {/* Range segmented control */}
+          <div role="group" aria-label="Time range" className="mf-tabs">
+            {RANGES.map((r) => (
+                <button
+                    key={r.value}
+                    onClick={() => setRange(r.value)}
+                    aria-pressed={range === r.value}
+                    className="mf-tab px-3"
+                    aria-selected={range === r.value}
+                >
+                  {r.label}
+                </button>
+            ))}
+          </div>
+        </header>
 
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null;
-                  const point = payload[0].payload as ChartPoint;
-                  const event = point._wateringEvent;
-                  return (
-                    <div style={{ background: "#fff", border: "1px solid #e5e7eb", padding: "8px 12px", borderRadius: 6 }}>
-                      <p>{new Date(point.timestamp).toLocaleString()}</p>
-                      <p>Moisture: {point.moisture}%</p>
-                      {event && (
-                        <p style={{ marginTop: 4, fontWeight: 600, color: WATERING_COLOR[event.mode] }}>
-                          {MODE_LABELS[event.mode]} Watering — {event.waterUsedLiters} L
-                        </p>
-                      )}
-                    </div>
-                  );
-                }}
-              />
+        {/* ── States ─────────────────────────────────────────── */}
+        {status === "loading" && (
+            <div
+                aria-busy="true"
+                aria-label="Loading soil moisture data"
+                className="h-[300px] bg-mf-cream/50 rounded-mf-md animate-pulse"
+            />
+        )}
 
-              <Line
-                type="monotone"
-                dataKey="moisture"
-                stroke="#4ade80"
-                connectNulls
-                dot={(props: any) => {
-                  const { cx, cy, payload, key } = props;
-                  if (!payload._wateringEvent) {
-                    return <circle key={key} cx={cx} cy={cy} r={0} fill="none" />;
-                  }
-                  const mode = payload._wateringEvent.mode as WateringEvent["mode"];
-                  const color = WATERING_COLOR[mode];
-                  if (mode === "automatic") {
-                    return (
-                      <rect
-                        key={key}
-                        x={cx - 5}
-                        y={cy - 5}
-                        width={10}
-                        height={10}
-                        rx={2}
-                        fill={color}
-                        stroke="white"
-                        strokeWidth={1.5}
+        {status === "error" && (
+            <div
+                role="alert"
+                className="flex items-center justify-between gap-4 p-4 rounded-mf-md
+                     bg-[#F4DBD2]/40 border border-[#E9C3B5]"
+            >
+              <p className="text-sm text-mf-ink-2">{errorMessage}</p>
+              <button onClick={fetchData} className="mf-btn mf-btn-secondary mf-btn-sm">
+                Retry
+              </button>
+            </div>
+        )}
+
+        {status === "empty" && (
+            <div className="rounded-mf-md border border-dashed border-mf-line-2
+                        bg-mf-cream/40 p-8 text-center">
+              <p className="text-sm text-mf-ink-3 max-w-sm mx-auto">
+                No moisture history yet. Readings will appear here once your sensor
+                has been active for a while.
+              </p>
+            </div>
+        )}
+
+        {status === "success" && (
+            <>
+              {/* Legend */}
+              <div role="list" aria-label="Chart legend" className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-mf-ink-2">
+                <LegendItem color={COLOR.moisture} shape="line" label="Soil moisture" />
+                {setupId !== undefined && (
+                    <>
+                      <LegendItem
+                          color={COLOR.manual}
+                          shape="circle"
+                          label="Manual watering"
+                          testId="legend-manual"
                       />
-                    );
-                  }
-                  return (
-                    <circle
-                      key={key}
-                      cx={cx}
-                      cy={cy}
-                      r={5}
-                      fill={color}
-                      stroke="white"
-                      strokeWidth={1.5}
+                      <LegendItem
+                          color={COLOR.auto}
+                          shape="square"
+                          label="Automatic watering"
+                          testId="legend-automatic"
+                      />
+                    </>
+                )}
+                {wateringError && (
+                    <span aria-live="polite" className="text-mf-ink-4 font-mono">
+                · watering data unavailable
+              </span>
+                )}
+              </div>
+
+              {/* Chart */}
+              <div className="-mx-2">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="2 4" stroke={COLOR.grid} vertical={false} />
+                    <XAxis
+                        dataKey="time"
+                        type="number"
+                        scale="time"
+                        domain={["dataMin", "dataMax"]}
+                        tickFormatter={formatXTick(range)}
+                        stroke={COLOR.axis}
+                        tick={{ fill: COLOR.axis, fontSize: 11, fontFamily: "JetBrains Mono, monospace" }}
+                        tickLine={false}
+                        axisLine={{ stroke: COLOR.grid }}
                     />
-                  );
-                }}
-                activeDot={{ r: 5 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </>
-      )}
-    </div>
+                    <YAxis
+                        domain={[0, 100]}
+                        stroke={COLOR.axis}
+                        tick={{ fill: COLOR.axis, fontSize: 11, fontFamily: "JetBrains Mono, monospace" }}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(v) => `${v}%`}
+                        width={42}
+                    />
+                    <Tooltip content={<MoistureTooltip />} />
+                    <Line
+                        type="monotone"
+                        dataKey="moisture"
+                        stroke={COLOR.moisture}
+                        strokeWidth={1.8}
+                        connectNulls
+                        dot={(props: any) => {
+                          const { cx, cy, payload, key } = props;
+                          if (!payload._wateringEvent)
+                            return <circle key={key} cx={cx} cy={cy} r={0} fill="none" />;
+                          const mode = payload._wateringEvent.mode as WateringEvent["mode"];
+                          const color = WATERING_COLOR[mode];
+                          if (mode === "automatic") {
+                            return (
+                                <rect key={key} x={cx - 5} y={cy - 5} width={10} height={10}
+                                      rx={2} fill={color} stroke={COLOR.card} strokeWidth={1.5} />
+                            );
+                          }
+                          return (
+                              <circle key={key} cx={cx} cy={cy} r={5}
+                                      fill={color} stroke={COLOR.card} strokeWidth={1.5} />
+                          );
+                        }}
+                        activeDot={{ r: 5, fill: COLOR.moisture, stroke: COLOR.card, strokeWidth: 2 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </>
+        )}
+      </article>
+  );
+}
+
+/* ── Subcomponents ─────────────────────────────────────────── */
+function LegendItem({
+                      color, shape, label, testId,
+                    }: { color: string; shape: "line" | "circle" | "square"; label: string; testId?: string }) {
+  return (
+      <span role="listitem" className="inline-flex items-center gap-1.5">
+      <span
+          aria-hidden="true"
+          data-testid={testId}
+          data-shape={shape}
+          className="inline-block"
+          style={{
+            background: color,
+            width: shape === "line" ? 22 : 10,
+            height: shape === "line" ? 2.5 : 10,
+            borderRadius: shape === "circle" ? "50%" : shape === "square" ? 2 : 2,
+          }}
+      />
+      <span className="text-mf-ink-2">{label}</span>
+    </span>
+  );
+}
+
+function MoistureTooltip({ active, payload }: any) {
+  if (!active || !payload?.length) return null;
+  const point = payload[0].payload as ChartPoint;
+  const event = point._wateringEvent;
+  return (
+      <div className="mf-card shadow-mf-2 px-3 py-2.5 text-xs">
+        <p className="font-mono text-mf-ink-3">
+          {new Date(point.timestamp).toLocaleString([], {
+            month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+          })}
+        </p>
+        <p className="mt-1 font-serif text-lg text-mf-ink tracking-tight">
+          {point.moisture}<span className="text-sm text-mf-ink-3">%</span>
+        </p>
+        {event && (
+            <p className="mt-1.5 pt-1.5 border-t border-mf-line text-[11px] font-medium"
+               style={{ color: WATERING_COLOR[event.mode] }}>
+              {MODE_LABELS[event.mode]} watering · {event.waterUsedMl}
+            </p>
+        )}
+      </div>
   );
 }

@@ -12,6 +12,7 @@ export interface Plant {
 
 export interface SensorHistoricalReading {
   value: number;
+  mode: string;
   timestamp: string;
 }
 
