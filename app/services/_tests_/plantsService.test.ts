@@ -1,0 +1,69 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import api from "../../api/client";
+import { getPlantsBySetup } from "../plantsService";
+import type { Plant } from "../../model/plant/types";
+
+vi.mock("../../api/client", () => ({
+  default: { get: vi.fn() },
+}));
+vi.mock("~/mocks/index", () => ({ isMockEnabled: false }));
+
+const mockGet = vi.mocked(api.get);
+
+const plants: Plant[] = [
+  {
+    id: 1,
+    sensorId: 101,
+    name: "Basil",
+    description: "Mediterranean herb",
+    type: "herb",
+    datePlanted: "2024-01-01",
+    status: "growing",
+  },
+];
+
+const makeAxiosError = (status: number) =>
+  Object.assign(new Error(`HTTP ${status}`), { response: { status } });
+
+describe("plantsService", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe("getPlantsBySetup", () => {
+    it("hits the correct endpoint", async () => {
+      mockGet.mockResolvedValueOnce({ data: plants });
+      await getPlantsBySetup(3);
+      expect(mockGet).toHaveBeenCalledWith("/api/growingsetups/3/plants");
+    });
+
+    it("returns the response data", async () => {
+      mockGet.mockResolvedValueOnce({ data: plants });
+      await expect(getPlantsBySetup(3)).resolves.toEqual(plants);
+    });
+
+    it("returns an empty array when the setup has no plants", async () => {
+      mockGet.mockResolvedValueOnce({ data: [] });
+      await expect(getPlantsBySetup(3)).resolves.toEqual([]);
+    });
+
+    it("propagates network errors", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Network Error"));
+      await expect(getPlantsBySetup(3)).rejects.toThrow("Network Error");
+    });
+
+    it("propagates 401 responses", async () => {
+      mockGet.mockRejectedValueOnce(makeAxiosError(401));
+      await expect(getPlantsBySetup(3)).rejects.toMatchObject({
+        response: { status: 401 },
+      });
+    });
+
+    it("propagates 500 responses", async () => {
+      mockGet.mockRejectedValueOnce(makeAxiosError(500));
+      await expect(getPlantsBySetup(3)).rejects.toMatchObject({
+        response: { status: 500 },
+      });
+    });
+  });
+});

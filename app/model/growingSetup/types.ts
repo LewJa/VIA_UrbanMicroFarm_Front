@@ -1,0 +1,32 @@
+export interface GrowingSetup {
+  id: number;
+  location: string;
+  status: string;
+  sensorSlots?: number;
+}
+
+export interface SetupReading {
+  setupId: number;
+  timestamp: string;
+  temperature: number;
+  humidity: number;
+  light: number;
+}
+
+export interface WateringEvent {
+  id: number;
+  waterUsedMl: number;
+  mode: "manual" | "automatic";
+  createdAt: string;
+}
+
+export interface MoistureSensor {
+  id: number;
+  status: string;
+}
+
+export interface Sensor {
+  id: number;
+  sensorType: string;
+  status: string;
+}

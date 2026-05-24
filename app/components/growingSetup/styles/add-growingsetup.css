@@ -1,0 +1,190 @@
+@keyframes mf-modal-overlay-in {
+  from { background-color: rgba(0,0,0,0); }
+  to   { background-color: rgba(0,0,0,0.5); }
+}
+@keyframes mf-modal-overlay-out {
+  from { background-color: rgba(0,0,0,0.5); }
+  to   { background-color: rgba(0,0,0,0); }
+}
+@keyframes mf-modal-in {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes mf-modal-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.94) translateY(8px); }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: mf-modal-overlay-in 200ms ease forwards;
+}
+
+.modal-overlay.is-closing {
+  animation: mf-modal-overlay-out 180ms ease forwards;
+}
+
+.modal-container {
+  background-color: var(--color-mf-card);
+  border: 1px solid var(--color-mf-line);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px -20px rgba(0,0,0,.28), 0 8px 20px -10px rgba(0,0,0,.12);
+  width: 90%;
+  max-width: 400px;
+  overflow: hidden;
+  animation: mf-modal-in 260ms cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+.modal-overlay.is-closing .modal-container {
+  animation: mf-modal-out 180ms ease forwards;
+}
+
+.modal-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-mf-ink);
+  margin: 0;
+}
+
+.modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-mf-ink-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: background-color 150ms;
+}
+
+.modal-close-btn:hover {
+  background-color: var(--color-mf-bg-2);
+}
+
+.modal-description {
+  font-size: 0.875rem;
+  color: var(--color-mf-ink-3);
+  margin: -8px 0 0;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-mf-ink-2);
+  letter-spacing: 0.01em;
+}
+
+.modal-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  background-color: var(--color-mf-card);
+  color: var(--color-mf-ink);
+  border: 1px solid var(--color-mf-line-2);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-family: var(--font-sans);
+  outline: none;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+
+.modal-input:focus {
+  border-color: var(--color-mf-forest);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-mf-forest) 15%, transparent);
+}
+
+.modal-input::placeholder {
+  color: var(--color-mf-ink-4);
+}
+
+select.modal-input {
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%237A7768' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+textarea.modal-input {
+  height: auto;
+  min-height: 80px;
+  padding: 10px 14px;
+  resize: vertical;
+}
+
+.modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--color-mf-line);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-cancel {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-mf-line-2);
+  background-color: var(--color-mf-card);
+  color: var(--color-mf-ink);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.btn-cancel:hover {
+  background-color: var(--color-mf-cream);
+}
+
+.btn-continue {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: none;
+  background-color: var(--color-mf-forest);
+  color: #F4EEDB;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.btn-continue:hover {
+  background-color: var(--color-mf-forest-2);
+}
