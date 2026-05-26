@@ -41,7 +41,7 @@ const twoReadings = [
 
 describe("SoilMoistureHistoryChart", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("renders loading state initially", () => {
