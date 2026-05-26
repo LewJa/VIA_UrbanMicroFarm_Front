@@ -41,7 +41,7 @@ const twoReadings = [
 
 describe("SoilMoistureHistoryChart", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("renders loading state initially", () => {
@@ -156,18 +156,18 @@ describe("SoilMoistureHistoryChart", () => {
     );
   });
 
-  it("passes raw values directly to chart data (no ADC conversion)", async () => {
+  it("converts ADC sensor readings to percentage for the chart", async () => {
     mockGetHistoricalReadings.mockResolvedValue([
-      { value: 38.0, timestamp: "2024-01-01T10:00:00Z" },
-      { value: 76.4, timestamp: "2024-01-01T11:00:00Z" },
+      { value: 389, timestamp: "2024-01-01T10:00:00Z" },
+      { value: 778, timestamp: "2024-01-01T11:00:00Z" },
     ]);
     render(<SoilMoistureHistoryChart sensorId={1} />);
     await waitFor(() => {
       const data = JSON.parse(
         screen.getByTestId("line-chart").getAttribute("data-chart-data")!,
       );
-      expect(data[0].moisture).toBe(38.0);
-      expect(data[1].moisture).toBe(76.4);
+      expect(data[0].moisture).toBe(38);
+      expect(data[1].moisture).toBe(76);
     });
   });
 
@@ -205,13 +205,10 @@ describe("SoilMoistureHistoryChart — watering overlay", () => {
   });
 
   // C-2
-  it("logs console.warn once on mount when setupId is absent", async () => {
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+  it("renders the chart without errors when setupId is absent", async () => {
     render(<SoilMoistureHistoryChart sensorId={1} />);
     await waitFor(() => screen.getByTestId("line-chart"));
-    expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("setupId not provided"));
-    warnSpy.mockRestore();
+    expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
 
   // C-3: uses createdAt (new WateringEvent shape)

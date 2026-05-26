@@ -1,5 +1,6 @@
 import { NavLink } from "react-router";
 import { useAlerts } from "~/context/AlertsContext";
+import { useAuth } from "~/context/AuthContext";
 
 const SproutIcon = () => (
   <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -39,6 +40,8 @@ const UserIcon = () => (
 
 export function Navbar() {
   const { unreadCount } = useAlerts();
+  const { user } = useAuth();
+  const avatarInitial = (user?.name || user?.email || "?").charAt(0).toUpperCase();
 
   return (
     <>
@@ -54,7 +57,7 @@ export function Navbar() {
           <nav className="hidden md:flex items-center gap-2">
             <NavLink
               viewTransition
-              to="/"
+              to="/home"
               className={({ isActive }) => `px-4 py-2 rounded-full text-[15px] transition-colors ${isActive ? "bg-mf-cream text-mf-forest font-bold" : "text-mf-ink-3 hover:text-mf-forest font-medium"}`}
             >
               Home
@@ -94,7 +97,7 @@ export function Navbar() {
             to="/account"
             className="hidden md:flex w-9 h-9 rounded-full bg-mf-clay text-mf-cream items-center justify-center text-sm font-medium shadow-sm hover:opacity-90 transition-opacity"
           >
-            A
+            {avatarInitial}
           </NavLink>
         </div>
       </header>
@@ -103,7 +106,7 @@ export function Navbar() {
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-mf-bg border-t border-mf-line flex justify-around items-center pt-3 pb-7">
         <NavLink
           viewTransition
-          to="/"
+          to="/home"
           className={({ isActive }) => `flex flex-col items-center gap-1.5 transition-colors ${isActive ? "text-mf-forest font-bold" : "text-mf-ink-3 font-medium"}`}
         >
           <HomeIcon />

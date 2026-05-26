@@ -29,6 +29,7 @@ function renderPage() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<div data-testid="home-page" />} />
+        <Route path="/home" element={<div data-testid="home-page" />} />
         <Route path="/register" element={<div data-testid="register-page" />} />
       </Routes>
     </MemoryRouter>,
@@ -93,7 +94,7 @@ describe("LoginPage", () => {
   it("calls userService.login with the entered email and password", async () => {
     mockServiceLogin.mockResolvedValueOnce({
       token: "tok-123",
-      user: { id: 1, email: "a@b.com", theme: "light" },
+      user: { id: 1, name: "Alice", email: "a@b.com", theme: "light" },
     });
     renderPage();
     fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@b.com" } });
@@ -108,7 +109,7 @@ describe("LoginPage", () => {
   });
 
   it("calls auth context login with token and user on success", async () => {
-    const user = { id: 1, email: "a@b.com", theme: "light" as const };
+    const user = { id: 1, name: "Alice", email: "a@b.com", theme: "light" as const };
     mockServiceLogin.mockResolvedValueOnce({ token: "tok-123", user });
     renderPage();
     fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@b.com" } });
@@ -123,7 +124,7 @@ describe("LoginPage", () => {
     vi.useFakeTimers();
     mockServiceLogin.mockResolvedValueOnce({
       token: "tok-123",
-      user: { id: 1, email: "a@b.com", theme: "light" },
+      user: { id: 1, name: "Alice", email: "a@b.com", theme: "light" },
     });
     renderPage();
     await act(async () => {

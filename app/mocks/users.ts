@@ -1,6 +1,6 @@
 import type { UserProfile, UserWithName, LoginResponse } from "~/model/user/types";
 
-const MOCK_USER: UserProfile = { id: 1, email: "user@example.com", theme: "system" };
+const MOCK_USER: UserProfile = { id: 1, name: "Test User", email: "user@example.com", theme: "system" };
 
 export const mockUsers = {
   register: async (): Promise<{ message: string }> => ({

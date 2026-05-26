@@ -60,7 +60,6 @@ export default function GrowingSetupPage() {
 
         const readingsFetch = growingSetupsService.getSetupSensorReadings(id).catch(() => null);
         const sensorsFetch = growingSetupsService.fetchAllAssignedSensors(id).catch(() => []);
-        console.log(sensorsFetch);
 
         Promise.all([
             readingsFetch,
@@ -96,8 +95,6 @@ export default function GrowingSetupPage() {
                 }
                 setPageStatus("error");
             });
-
-        console.log(sensors)
 
         return () => {
             alive = false;
@@ -319,7 +316,7 @@ export default function GrowingSetupPage() {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 md:gap-4 pr-1 sm:pr-2 cursor-pointer" onClick={() => navigate(`/setup/${id}/sensor/${plant.sensorId ?? 1}/plant/${plant.id}`)}>
-                                                {currentStatus === "water" ? (
+                                                {currentStatus === "stressed" ? (
                                                     <div className="mf-chip mf-chip-warn px-2.5 py-1.5 h-auto">
                                                         <div className="mf-chip-dot"></div>
                                                         <span className="text-[12px] font-bold tracking-wide pl-1">water</span>

@@ -52,8 +52,8 @@ export default function RegisterPage() {
     try {
       await userService.register({ name, email, password });
       const resp = await userService.login({ email, password });
-      login(resp.token, resp.user);
-      navigate("/", { replace: true, viewTransition: true });
+      login(resp.token, { ...resp.user, name: resp.user.name || name });
+      navigate("/home", { replace: true, viewTransition: true });
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       setServerError(

@@ -126,7 +126,7 @@ describe("AccountPage", () => {
 
   it("calls setTheme and updateUser when a theme option is chosen", async () => {
     vi.mocked(userService.setTheme).mockResolvedValueOnce({
-      user: { id: 1, email: "alice@example.com", theme: "dark" },
+      user: { id: 1, name: "Alice", email: "alice@example.com", theme: "dark" },
     });
     renderPage();
     fireEvent.click(screen.getByText("Theme"));
