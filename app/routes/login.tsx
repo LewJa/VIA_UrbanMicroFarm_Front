@@ -130,7 +130,7 @@ export default function LoginPage() {
       const resp = await userService.login({ email, password });
       login(resp.token, resp.user);
       setShowSuccess(true);
-      setTimeout(() => navigate("/", { replace: true }), 1750);
+      setTimeout(() => navigate("/home", { replace: true }), 1750);
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       setServerError(

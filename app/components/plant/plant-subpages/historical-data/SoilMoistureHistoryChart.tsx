@@ -80,10 +80,6 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId 
   const [errorMessage, setErrorMessage] = useState("");
   const [wateringError, setWateringError] = useState(false);
 
-  useEffect(() => {
-    if (setupId === undefined)
-      console.warn("SoilMoistureHistoryChart: setupId not provided, watering overlay disabled");
-  }, [setupId]);
 
   const fetchData = useCallback(async () => {
     setStatus("loading");
@@ -92,7 +88,6 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId 
     const { from, to } = getRangeTimestamps(range);
     try {
       const readings = await sensorService.getHistoricalReadings(sensorId, { from, to });
-      console.log(readings);
       if (readings.length <= 1) {
         setStatus("empty");
         return;
@@ -105,7 +100,6 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId 
       if (setupId !== undefined) {
         try {
           const events = await wateringService.getHistoricalWateringEvents(setupId, from, to);
-          console.log(events)
           for (const event of events) {
             const eventTime = Date.parse(event.createdAt);
             let nearest = moisturePoints[0];
@@ -116,8 +110,7 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId 
             }
             nearest._wateringEvent = event;
           }
-        } catch (err) {
-          console.error("watering events fetch failed", err);
+        } catch {
           setWateringError(true);
         }
       }

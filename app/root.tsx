@@ -95,7 +95,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 import { Navbar } from "./components/navbar/Navbar";
 
-const AUTH_PATHS = new Set(["/login", "/register"]);
+const AUTH_PATHS = new Set(["/", "/login", "/register"]);
 
 export default function App() {
   const location = useLocation();

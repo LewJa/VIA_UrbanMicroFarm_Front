@@ -45,7 +45,7 @@ const basePlant = {
 };
 
 const moistureReading = {
-  sensorId: 3,
+  sensorId: "3",
   value: 512,
   timestamp: "2024-01-15T10:30:00Z",
 };

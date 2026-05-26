@@ -122,13 +122,12 @@ export default function BasicData() {
             .then(([moistureRes, setupRes]) => {
                 if (moistureRes.status === "fulfilled") setMoisture(moistureRes.value);
                 else if ((moistureRes.reason as any)?.response?.status !== 404) {
-                    console.error("Failed to fetch moisture reading:", moistureRes.reason);
+                    setError("Failed to load sensor data.");
                 }
                 if (setupRes.status === "fulfilled") setSetupReading(setupRes.value);
                 setLoading(false);
             })
-            .catch((err) => {
-                console.error(err);
+            .catch(() => {
                 setError("Failed to load sensor data.");
                 setLoading(false);
             });

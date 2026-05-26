@@ -21,7 +21,7 @@ const mockPut = vi.mocked(api.put);
 const makeAxiosError = (status: number) =>
   Object.assign(new Error(`HTTP ${status}`), { response: { status } });
 
-const userProfile: UserProfile = { id: 1, email: "user@example.com", theme: "light" };
+const userProfile: UserProfile = { id: 1, name: "Alice", email: "user@example.com", theme: "light" };
 const userWithName: UserWithName = { id: 1, name: "Alice", email: "user@example.com" };
 const loginResponse: LoginResponse = { token: "jwt-token-abc", user: userProfile };
 

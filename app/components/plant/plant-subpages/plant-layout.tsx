@@ -48,9 +48,7 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
     const load = async () => {
       try {
         const data = await getPlant(Number(plantId));
-        console.log(data);
         setPlant(data);
-        console.log(data.id, data.name, "health:", data.health, "→ status:", currentStatus)
         const last = await wateringService.getLastWateringEvent(data.id);
         setLastWatering(last.createdAt);
       } catch (err: unknown) {

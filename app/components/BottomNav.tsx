@@ -38,15 +38,14 @@ export default function BottomNav() {
     >
       <nav className="flex justify-around items-start pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
         {[
-          { to: "/", label: "Home", icon: HOME_ICON },
-          { to: "/plants", label: "Plants", icon: PLANTS_ICON },
+          { to: "/home", label: "Home", icon: HOME_ICON },
           { to: "/alerts", label: "Alerts", icon: ALERTS_ICON, badge: unreadCount },
           { to: "/account", label: "Account", icon: ACCOUNT_ICON },
         ].map(({ to, label, icon, badge }) => (
           <NavLink
             key={to}
             to={to}
-            end={to === "/"}
+            end={to === "/home"}
             className={({ isActive }) =>
               `flex flex-col items-center gap-1 w-[90px] pb-1 text-[11px] font-medium transition-colors ${
                 isActive ? "text-mf-forest" : "text-mf-ink-3"

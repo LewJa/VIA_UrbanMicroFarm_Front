@@ -205,13 +205,10 @@ describe("SoilMoistureHistoryChart — watering overlay", () => {
   });
 
   // C-2
-  it("logs console.warn once on mount when setupId is absent", async () => {
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+  it("renders the chart without errors when setupId is absent", async () => {
     render(<SoilMoistureHistoryChart sensorId={1} />);
     await waitFor(() => screen.getByTestId("line-chart"));
-    expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("setupId not provided"));
-    warnSpy.mockRestore();
+    expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
 
   // C-3: uses createdAt (new WateringEvent shape)

@@ -14,7 +14,7 @@ export default function Home() {
   const [growingSetups, setGrowingSetups] = useState<GrowingSetup[]>([]);
   const [growingSetupError, setGrowingSetupError] = useState(null);
 
-  const userName = user?.name || user?.email?.split("@")[0] || "";
+  const userName = user?.name || "";
   const [welcomeText] = useState(`Good morning, `);
 
 
@@ -33,16 +33,7 @@ export default function Home() {
     if (!userId) return;
 
     try {
-        console.log(data);
         setIsModalOpen(false);
-
-        // Right now the serial number is the serial number with all non-numeric characters removed, acting as a setup ID.
-        // const numericPart = data.serialNumber.replace(/\D/g, '');
-        // const setupId = parseInt(numericPart, 10);
-        //
-        // if (isNaN(setupId)) {
-        //     throw new Error("Serial number must contain numbers to act as a setup ID");
-        // }
 
         const response = await growingSetupsService.assignSetupToUser(userId, data.serialNumber);
         
@@ -54,8 +45,7 @@ export default function Home() {
         setGrowingSetups(setups);
 
         setShowConfirmation(true);
-    } catch (error) {
-        console.error("Failed to add setup:", error);
+    } catch {
         setShowErrorModal(true);
     }
   };
