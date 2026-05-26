@@ -94,7 +94,7 @@ export default function SoilMoistureHistoryChart({ sensorId, plantName, setupId 
       }
       const moisturePoints: ChartPoint[] = readings.map((r: SensorHistoricalReading) => ({
         time: new Date(r.timestamp).getTime(),
-        moisture: r.value,
+        moisture: Math.round((r.value / 1023) * 100),
         timestamp: r.timestamp,
       }));
       if (setupId !== undefined) {
