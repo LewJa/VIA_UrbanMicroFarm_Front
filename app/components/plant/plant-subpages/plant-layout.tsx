@@ -222,7 +222,7 @@ export function PlantLayout({ plantId }: PlantLayoutProps) {
                     ) : (
                         <div className="mf-chip mf-chip-ok px-2.5 py-1.5 h-auto">
                           <div className="mf-chip-dot"></div>
-                          <span className="text-[12px] font-bold tracking-wide pl-1">ok</span>
+                          <span className="text-[12px] font-bold tracking-wide pl-1">healthy</span>
                         </div>
                     )}
                     <span className="mf-chip">
