@@ -1,5 +1,7 @@
 # VIA Urban MicroFarm — Frontend
 
+**Live Demo:** [urbanmicrofarm.azurewebsites.net](https://urbanmicrofarm.azurewebsites.net/)
+
 A web application for managing and monitoring urban micro-farming environments. Users can track growing setups, monitor real-time sensor data (temperature, soil moisture, sunlight), view AI-driven predictions, and manage watering events.
 
 ## Tech Stack
